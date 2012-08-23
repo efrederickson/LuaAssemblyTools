@@ -10,6 +10,7 @@ Decompile.LASM = function(file)
         write("; Function " .. chunk.Name)
         write(".func")
         write(".name \"" .. chunk.Name .. "\"")
+        write(".options " .. chunk.UpvalueCount .. " " .. chunk.ArgumentCount .. " " .. chunk.Vararg .. " " .. chunk.MaxStackSize)
         write""
         if chunk.Constants.Count > 0 then
             write("; Constants")

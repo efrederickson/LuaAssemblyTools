@@ -17,12 +17,13 @@ Yes              Read (Lua 5.1)                   Reads bytecode
 Yes              Write                            Writes bytecode
 Yes              Edit                             Inject, remove, and change bytecode
 Yes [1]          LASM Decompiler                  Decompiles chunks to LASM
-YES              LASM Parser                      Parses LASM and generates LuaFile's
+Yes              LASM Parser                      Parses LASM and generates LuaFile's
 No               Decompiler                       Decompiles LuaFile's to Lua
-No               DASM converter                   Converts LuaFiles to DASM
-No               MSIL converter                   Converts LuaFiles to MSIL
-No               JVM converter                    Converts LuaFiles to Java bytecode
+No               DASM Decompiler                  Converts LuaFiles to DASM
+No               MSIL Decompiler                  Converts LuaFiles to MSIL
+No               JVM Decompiler                   Converts LuaFiles to Java bytecode
 No               Version converter (2.4-5.2)      Convert chunks to different versions
+No               Platform converter               ChunkSpy does this already... 
 Partial          Verifier                         Verifies bytecode is valid
 Yes              Strip/Remove debugging info      Removes debugging info
 Yes              Add/Edit debugging info          Adds and/or edits debugging info
