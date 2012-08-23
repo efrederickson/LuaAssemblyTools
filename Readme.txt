@@ -3,7 +3,7 @@ Lua Bytecode/Assembly Tools is a Lua bytecode library written in Lua 5.1
 Inspired by:
 LuaDbg (http://www.roblox.com/Item.aspx?id=52358617), 
 LASM Compiler Suite (http://www.roblox.com/Item.aspx?id=26966291),
-MODS (http://www.roblox.com/Item.aspx?id=44474190),
+MODS (http://www.roblox.com/Item.aspx?id=44474190 or github.com/NecroBumpist/MODS),
 ChunkBake (http://luaforge.net/projects/chunkbake),
 and ChunkSpy (http://luaforge.net/projects/chunkspy).
 
