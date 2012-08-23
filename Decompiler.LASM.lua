@@ -23,25 +23,22 @@ Decompile.LASM = function(file)
                 elseif c.Type == "Number" then
                     write(".const " .. c.Value)
                 elseif c.Type == "String" then
-                    local _ = c.Value
-                    for i = 1, _:len() do
-                        if _:sub(i, i) == "\n" then
-                            _ = _:sub(1, i - 1) .. "\\n" .. _:sub(i)
-                        elseif _:sub(i, i) == "\t" then
-                            _ = _:sub(1, i - 1) .. "\\t" .. _:sub(i)
-                        elseif _:sub(i, i) == "\r" then
-                            _ = _:sub(1, i - 1) .. "\\r" .. _:sub(i)
-                        elseif _:sub(i, i) == "\0" then
-                            _ = _:sub(1, i - 1) .. "\\0" .. _:sub(i)
-                        elseif _:sub(i, i) == "\"" then
-                            _ = _:sub(1, i - 1) .. "\\\"" .. _:sub(i)
-                        elseif _:sub(i, i) == "'" then
-                            _ = _:sub(1, i - 1) .. "\\'" .. _:sub(i)
-                        elseif _:sub(i, i) == "\\" then
-                            _ = _:sub(1, i - 1) .. "\\\\" .. _:sub(i)
+                    local v = ""
+                    for i = 1, c.Value:len() do
+                        local ch = string.byte(c.Value, i)
+                        -- other chars with values > 31 are '"' (34), '\' (92) and > 126
+                        if ch < 32 or ch == 34 or ch == 92 or ch > 126 then
+                            if ch >= 7 and ch <= 13 then
+                                ch = string.sub("abtnvfr", ch - 6, ch - 6)
+                            elseif ch == 34 or ch == 92 then
+                                ch = string.char(ch)
+                            end
+                            v = v .. "\\" .. ch
+                        else-- 32 <= v <= 126 (NOT 255)
+                            v = v .. string.char(ch)
                         end
                     end
-                    write(".const \"" .. _ .. "\"")
+                    write(".const \"" .. v .. "\"")
                 end
             end
         end

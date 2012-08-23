@@ -2,74 +2,88 @@ require"Instruction"
 require"bin"
 require"Chunk"
 require"LuaFile"
+require"PlatformConfig"
 
 function Disassemble(chunk)
     if chunk == nil then
         error("File is nil!")
     end
 	local index = 1
-	local tab = {}
 	local big = false;
     local file = LuaFile:new()
+    local loadNumber = nil
+    
+    local function Read(len)
+        len = len or 1
+        local c = chunk:sub(index, index + len - 1)
+        index = index + len
+        if file.BigEndian then
+            c = string.reverse(c)
+        else
+        end
+        return c
+    end
 	
-	local function GetInt8()		
+	local function ReadInt8()		
 		local a = chunk:sub(index, index):byte()
 		index = index + 1
 		return a
 	end
-	local function GetInt16(str, inx)
-		local a = GetInt8()
-		local b = GetInt8()
-		return 256 * b + a
-	end
-	local function GetInt32(str, inx)
-		local a = GetInt16()
-		local b = GetInt16()
-		return 65536 * b + a
-	end
-	local function GetFloat64()
-		local a = GetInt32()
-		local b = GetInt32()
-		if a == b and a == 0 then
-			return 0;
-		else
-			return (-2 * bit.get(b, 32) + 1) * (2 ^ (bit.get(b, 21, 31) - 1023)) * ((bit.get(b, 1, 20) * (2 ^ 32) + a) / (2 ^ 52) + 1)
-		end
+    
+	local function ReadNumber()
+        return loadNumber(Read(file.NumberSize))
 	end
 	
 	local function GetString(len)
-		local str = chunk:sub(index, index+len-1)
+		local str = chunk:sub(index, index + len - 1)
 		index = index + len
 		return str
 	end
 	
-	local function GetTypeInt()
-		local a = GetInt8()
-		local b = GetInt8()
-		local c = GetInt8()
-		local d = GetInt8()
-		return d*16777216 + c*65536 + b*256 + a
+	local function ReadInt32()
+        if file.IntegerSize > file.SizeT then
+            error("IntegerSize cannot be greater than SizeT")
+        end
+        local x = Read(file.SizeT)
+        if not x or x:len() == 0 then
+            error("Could not load integer")
+        else
+            local sum = 0
+            for i = file.IntegerSize, 1, -1 do
+                sum = sum * 256 + string.byte(x, i)
+            end
+            -- test for negative number
+            if string.byte(x, file.IntegerSize) > 127 then
+                sum = sum - math.ldexp(1, 8 * file.IntegerSize)
+            end
+            return sum
+        end
 	end
-	local function GetTypeString()
-		local tmp = GetInt32()
-		if tab.SizeT == 8 then GetInt32() end
-		return GetString(tmp):sub(1, -2) -- Strip last '\0'
+    
+	local function ReadString()
+		local tmp = Read(file.SizeT)
+        local sum = 0
+        for i = file.SizeT, 1, -1 do
+          sum = sum * 256 + string.byte(tmp, i)
+        end
+		return GetString(sum):sub(1, -2) -- Strip last '\0'
 	end
-	local function GetTypeFunction()
+    
+	local function ReadFunction()
 		local c = Chunk:new()
-		c.Name = GetTypeString()
-		c.FirstLine = GetTypeInt()
-		c.LastLine = GetTypeInt()
-		c.UpvalueCount = GetInt8() -- Upvalues
-		c.ArgumentCount = GetInt8()
-		c.Vararg = GetInt8()
-		c.MaxStackSize = GetInt8()
+		c.Name = ReadString()
+		c.FirstLine = ReadInt32()
+		c.LastLine = ReadInt32()
+		c.UpvalueCount = ReadInt8() -- Upvalues
+		c.ArgumentCount = ReadInt8()
+		c.Vararg = ReadInt8()
+		c.MaxStackSize = ReadInt8()
 		
         -- Instructions
-		--c.Instructions.Count = GetInt32()
-        local count = GetInt32()
+		--c.Instructions.Count = ReadInt32()
+        local count = ReadInt32()
         for i = 1, count do
-            local op = GetInt32();
+            local op = ReadInt32();
             local opcode = bit.get(op, 1, 6)
             local instr = Instruction:new(opcode + 1, i)
             if instr.OpcodeType == "ABC" then
@@ -87,11 +101,11 @@ function Disassemble(chunk)
         end
 		
 		-- Constants
-        --c.Constants.Count = GetInt32()
-        count = GetInt32()
+        --c.Constants.Count = ReadInt32()
+        count = ReadInt32()
         for i = 1, count do
             local cnst = Constant:new()
-            local t = GetInt8()
+            local t = ReadInt8()
             
             cnst.Number = i-1
             
@@ -100,41 +114,41 @@ function Disassemble(chunk)
                 cnst.Value = ""
             elseif t == 1 then
                 cnst.Type = "Bool"
-                cnst.Value = GetInt8() ~= 0
+                cnst.Value = ReadInt8() ~= 0
             elseif t == 3 then
                 cnst.Type = "Number"
-                cnst.Value = GetFloat64()
+                cnst.Value = ReadNumber()
             elseif t == 4 then
                 cnst.Type = "String"
-                cnst.Value = GetTypeString()
+                cnst.Value = ReadString()
             end
             c.Constants[i - 1] = cnst
         end
 
         -- Protos
-        --c.Protos.Count = GetInt32()
-        count = GetInt32()
+        --c.Protos.Count = ReadInt32()
+        count = ReadInt32()
         for i = 1, count do
-            c.Protos[i - 1] = GetTypeFunction()
+            c.Protos[i - 1] = ReadFunction()
         end
         
         -- Line numbers
-        for i = 1, GetInt32() do 
-            c.Instructions[i - 1].LineNumber = GetInt32()
+        for i = 1, ReadInt32() do 
+            c.Instructions[i - 1].LineNumber = ReadInt32()
 		end
         
         -- Locals
-        --c.Locals.Count = GetInt32()
-        count = GetInt32()
+        --c.Locals.Count = ReadInt32()
+        count = ReadInt32()
         for i = 1, count do
-            c.Locals[i - 1] = Local:new(GetTypeString(), GetInt32(), GetInt32())
+            c.Locals[i - 1] = Local:new(ReadString(), ReadInt32(), ReadInt32())
         end
         
         -- Upvalues
-        --c.Upvalues.Count = GetInt32()
-        count = GetInt32()
+        --c.Upvalues.Count = ReadInt32()
+        count = ReadInt32()
         for i = 1, count do 
-            c.Upvalues[i - 1] = { Name = GetTypeString() }
+            c.Upvalues[i - 1] = { Name = ReadString() }
         end
 		
 		return c
@@ -144,17 +158,24 @@ function Disassemble(chunk)
     if file.Identifier ~= "\027Lua" then
         error("Not a valid Lua bytecode chunk")
     end
-	file.Version = GetInt8() -- 0x51
+	file.Version = ReadInt8() -- 0x51
     if file.Version ~= 0x51 then
-        error(string.format("Invalid bytecode version, 0x51 expected, got %x", file.Version))
+        error(string.format("Invalid bytecode version, 0x51 expected, got 0x%02x", file.Version))
     end
-	file.Format = GetInt8() == 0 and "Official" or "Unofficial"
-	file.BigEndian = GetInt8() == 0
-	file.IntegerSize = GetInt8()
-	file.SizeT = GetInt8() 	
-	file.InstructionSize = GetInt8()
-	file.NumberSize = GetInt8()
-	file.IsFloatingPointNumbers = GetInt8() == 0
-	file.Main = GetTypeFunction()
+	file.Format = ReadInt8() == 0 and "Official" or "Unofficial"
+    if file.Format == "Unofficial" then
+        error("Unknown binary chunk format")
+    end
+	file.BigEndian = ReadInt8() == 0
+	file.IntegerSize = ReadInt8()
+	file.SizeT = ReadInt8() 	
+	file.InstructionSize = ReadInt8()
+	file.NumberSize = ReadInt8()
+	file.IsFloatingPointNumbers = ReadInt8() == 0
+    loadNumber = GetNumberType(file)
+    if file.InstructionSize ~= 4 then
+        error("Unsupported instruction size '" .. file.InstructionSize .. "', expected '4'")
+    end
+	file.Main = ReadFunction()
 	return file
 end
