@@ -491,13 +491,12 @@ Parser = {
 if false then
     local p = Parser:new()
     local file = p:Parse[[
-    ; NecroBumpist's Lua Bytecode Function Stack Steal
-    .options 0 1 2 250 
-    .const nil
-    loadk 249 0
-    vararg 1 0  0
-    call 0 0 1 
-    return 1 0 0
+    .const "print"
+    .const "hello"
+    getglobal 0 0
+    loadk 1 1
+    call 0 2 1
+    return 0 1
     ]]
     local code = file:Compile()
     local f = io.open("lasm.out", "wb")
