@@ -1,0 +1,9 @@
+CHANGELOG FOR LBYTE
+
+8/22/12 - v1.1
+- LASM Decompiler
+- LASM Compiler
+- ROUND TRIP LASM DECOMPILER/COMPILER WORKS!!! :D HECK YES
+
+8/21/12 - v 1.0
+- Initial Commit

@@ -1,0 +1,24 @@
+LASM (Lua Assembly) is used to write Lua bytecode.
+I hope to write more information about it later.
+
+Controls:
+[] - Optional
+
+.const Value
+    Value = "String", true/false/nil, Number
+.local Name     
+    StartPC, EndPC = 0, 0
+.upval Name
+.upvalue Name
+.stacksize Value
+.maxstacksize value
+.vararg <Vararg int value>
+.name Name
+.options <Upvalue count> <Parameter count> <Vararg> <MaxStackSize>
+
+.func [name]
+.function [name]
+.end
+
+Opcodes:
+<code> <arg> <arg> <arg>
