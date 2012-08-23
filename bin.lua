@@ -41,19 +41,20 @@ local function srb (x,n) return math.floor(x / p2[n+1]) end
 local function slb (x,n) return x * p2[n+1] end
 
 DumpBinary = {
+    -- This is... bad. Only support X86 Standard
 	String = function(s)
 		if #s ~= 0 then
 			return DumpBinary.Int32(#s+1)..s.."\0"
 		else
 			return "\0\0\0\0";
 		end
-	end,
+	end,--[[
 	Integer = function(n)
 		return DumpBinary.Int32(n)
-	end,
+	end,]]
 	Int8 = function(n)
 		return string.char(n)
-	end,
+	end,--[[
 	Int16 = function(n)
 		error("DumpBinary::Int16() Not Implemented")
 	end,
@@ -103,7 +104,7 @@ DumpBinary = {
 		x, byte = grab_byte(sign * 128 + x)
 		v = v..byte -- 63:56
 		return v
-	end,
+	end,]]
     
     Opcode = function(op)
         local c0, c1, c2, c3

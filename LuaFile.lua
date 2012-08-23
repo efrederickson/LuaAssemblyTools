@@ -2,6 +2,7 @@ require"bin"
 require"Chunk"
 
 LuaFile = {
+    -- Default to x86 standard
     new = function(self)
         return setmetatable({
             Identifier = "\027Lua",
@@ -29,7 +30,7 @@ LuaFile = {
         c = c .. DumpBinary.Int8(self.NumberSize)
         c = c .. DumpBinary.Int8(self.IsFloatingPointNumbers and 0 or 1)
         -- Main function
-        c = c .. self.Main:Compile()
+        c = c .. self.Main:Compile(self)
         return c
     end,
     

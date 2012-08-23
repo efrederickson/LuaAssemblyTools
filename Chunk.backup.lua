@@ -43,43 +43,25 @@ Chunk = {
     end,
     
     Compile = function(self, file)
-        local _, DumpNumber = GetNumberType(file)
-        
-        local function DumpInt(num)
-            local v = ""
-            for i = 1, file.IntegerSize do
-                v = v .. string.char(num % 256)
-                num = math.floor(num / 256)
-            end
-            return v
-        end
-        
-        local function DumpString(s)
-            local len = file.SizeT
-            if not s or s:len() == 0 then
-                return string.rep("\0", len)
-            else
-                return DumpInt(s:len() + 1) .. s .. "\0"
-            end
-        end
+        local DumpInt = 
         
         local c = ""
-        c = c .. DumpString(self.Name)
-        c = c .. DumpInt(self.FirstLine)
-        c = c .. DumpInt(self.LastLine)
+        c = c .. DumpBinary.String(self.Name)
+        c = c .. DumpBinary.Integer(self.FirstLine)
+        c = c .. DumpBinary.Integer(self.LastLine)
         c = c .. DumpBinary.Int8(self.UpvalueCount)
         c = c .. DumpBinary.Int8(self.ArgumentCount)
         c = c .. DumpBinary.Int8(self.Vararg)
         c = c .. DumpBinary.Int8(self.MaxStackSize)
         
         -- Instructions
-        c = c .. DumpInt(self.Instructions.Count)
+        c = c .. DumpBinary.Integer(self.Instructions.Count)
         for i = 1, self.Instructions.Count do
             c = c .. DumpBinary.Opcode(self.Instructions[i - 1])
         end
         
         -- Constants
-        c = c .. DumpInt(self.Constants.Count)
+        c = c .. DumpBinary.Integer(self.Constants.Count)
         for i = 1, self.Constants.Count do
             local cnst = self.Constants[i - 1]
             if cnst.Type == "Nil" then
@@ -89,40 +71,40 @@ Chunk = {
                 c = c .. DumpBinary.Int8(cnst.Value and 1 or 0)
             elseif cnst.Type == "Number" then
                 c = c .. DumpBinary.Int8(3)
-                c = c .. DumpNumber(cnst.Value)
+                c = c .. DumpBinary.Float64(cnst.Value)
             elseif cnst.Type == "String" then
                 c = c .. DumpBinary.Int8(4)
-                c = c .. DumpString(cnst.Value)
+                c = c .. DumpBinary.String(cnst.Value)
             else
                 error("Invalid constant type: " .. (cnst.Type and cnst.Type or "<nil>"))
             end
         end
         
         -- Protos
-        c = c .. DumpInt(self.Protos.Count)
+        c = c .. DumpBinary.Integer(self.Protos.Count)
         for i = 1, self.Protos.Count do
             c = c .. self.Protos[i - 1]:Compile(file)
         end
         
         -- Line Numbers
-        c = c .. DumpInt(self.Instructions.Count)
+        c = c .. DumpBinary.Integer(self.Instructions.Count)
         for i = 1, self.Instructions.Count do
-            c = c .. DumpInt(self.Instructions[i - 1].LineNumber)
+            c = c .. DumpBinary.Integer(self.Instructions[i - 1].LineNumber)
         end
         
         -- Locals 
-        c = c .. DumpInt(self.Locals.Count)
+        c = c .. DumpBinary.Integer(self.Locals.Count)
         for i = 1, self.Locals.Count do
             local l = self.Locals[i - 1]
-            c = c .. DumpString(l.Name)
-            c = c .. DumpInt(l.StartPC)
-            c = c .. DumpInt(l.EndPC)
+            c = c .. DumpBinary.String(l.Name)
+            c = c .. DumpBinary.Integer(l.StartPC)
+            c = c .. DumpBinary.Integer(l.EndPC)
         end
         
         -- Upvalues
-        c = c .. DumpInt(self.Upvalues.Count)
+        c = c .. DumpBinary.Integer(self.Upvalues.Count)
         for i = 1, self.Upvalues.Count do
-            c = c .. DumpString(self.Upvalues[i - 1].Name)
+            c = c .. DumpBinary.String(self.Upvalues[i - 1].Name)
         end
         return c
     end,

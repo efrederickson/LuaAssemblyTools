@@ -24,6 +24,7 @@ Value = "String", true/false/nil, Number
 
 Opcodes:
 <code> <arg> <arg> <arg>
+The 'C' arg is optional, and defaults to 0
 ]]
 
 require"LuaFile"
@@ -294,41 +295,6 @@ Parser = {
             return varName
         end
         
-        local function readString()
-            if text:sub(index, index) == "\"" then
-                local s = ""
-                while true do
-                    local c = text:sub(index, index)
-                    if c == "\\" then
-                        local c2 = c .. text:sub(index + 1, index + 1)
-                        if c2 == "\\n" then
-                            s = s .. "\n"
-                        elseif c2 == "\\r" then
-                            s = s .. "\r"
-                        elseif c2 == "\\t" then
-                            s = s .. "\t"
-                        elseif c2 == "\\\\" then
-                            s = s .. "\\"
-                        elseif c2 == "\\\"" then
-                            s = s .. "\""
-                        elseif c2 == "\\'" then
-                            s = s .. "'"
-                        else
-                            error("Unknown escape sequence: " .. c2)
-                        end
-                        index = index + 2
-                    elseif c == "\"" then
-                        break
-                    else
-                        index = index + 1
-                        s = s .. c
-                    end
-                end
-            else
-                error("Expected '\"' not '" .. text:sub(index, index) .. "'")
-            end
-        end
-        
         local function readComment()
             if text:sub(index, index) == ";" then
                 while true do
@@ -372,6 +338,25 @@ Parser = {
                             s = s .. "\""
                         elseif c2 == "\\'" then
                             s = s .. "'"
+                        elseif c2 == "\\a" then
+                            s = s .. "\a"
+                        elseif c2 == "\\b" then
+                            s = s .. "\b"
+                        elseif c2 == "\\f" then
+                            s = s .. "\f"
+                        elseif c2 == "\\v" then
+                            s = s .. "\v"
+                        elseif string.find(c2, "\\%d") then
+                            local ch = text:sub(index + 1, index + 1)
+                            if string.find(text:sub(index + 2, index + 2), "%d") then
+                                index = index + 1
+                                ch = ch .. text:sub(index + 1, index + 1)
+                                if string.find(text:sub(index + 2, index + 2), "%d") then
+                                    index = index + 1
+                                    ch = ch .. text:sub(index + 1, index + 1)
+                                end
+                            end
+                            s = s .. string.char(tonumber(ch))
                         else
                             error("Unknown escape sequence: " .. c2)
                         end
@@ -488,11 +473,11 @@ Parser = {
     end,
 }
 
-if false then
+if false then -- Testing. 
     local p = Parser:new()
     local file = p:Parse[[
     .const "print"
-    .const "hello"
+    .const "h\101llo"
     getglobal 0 0
     loadk 1 1
     call 0 2 1
