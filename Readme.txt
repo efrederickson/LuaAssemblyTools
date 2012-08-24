@@ -30,4 +30,5 @@ Yes              Add/Edit debugging info          Adds and/or edits debugging in
 
 [1] - Fixed string decompilation.
 [2] - Might not work correctly. My tests failed, but it can still round-trip x86 standard chunks.
-[3] - TODO: I need to simplify the loading of variables and add '"' checking.
+[3] - TODO: I need to simplify the loading of variables and add '"' checking, and metatables is not working. 
+    Which is incredibly lame so i had to use getmetatable(x).__newindex(x, ...). This needs fixed also.

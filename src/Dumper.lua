@@ -61,19 +61,19 @@ function Dump(file)
             local _b = getSpec(chunk, instr, b, 2, i)
             local _c = getSpec(chunk, instr, c, 3, i)
             
-            print("[", i, "] (", instr.LineNumber or 0, ")\tOpcode: ", instr.Opcode, "\t",
+            print("[", i, "] (Line ", instr.LineNumber or 0, ")\tOpcode: ", instr.Opcode, "\t",
             a, "\t" ,b, "\t", c, "\t; ",_a, "\t ", _b, "\t ", _c)
         elseif instr.OpcodeType == "ABx" then
             local a, bx = instr.A, instr.Bx
             local _a = getSpec(chunk, instr, a, 1, i)
             local _bx = getSpec(chunk, instr, bx, 2, i)
             
-            print("[", i, "] (", instr.LineNumber or 0, ")\tOpcode: ", instr.Opcode, "\t", a, "\t" ,bx,
+            print("[", i, "] (Line ", instr.LineNumber or 0, ")\tOpcode: ", instr.Opcode, "\t", a, "\t" ,bx,
             "\t<nil>\t; ", _a, "\t ", _bx)
         elseif instr.OpcodeType == "AsBx" then
             local a, sbx = instr.A, instr.sBx
             local _a, _sbx = getSpec(chunk, instr, a, 1, i), getSpec(chunk, instr, sbx, 2, i);
-            print("[", i, "] (", instr.LineNumber or 0, ")\tOpcode: ", instr.Opcode, "\t", a, "\t", sbx, "\t<nil>\t; ", _a, "\t", _sbx)
+            print("[", i, "] (Line ", instr.LineNumber or 0, ")\tOpcode: ", instr.Opcode, "\t", a, "\t", sbx, "\t<nil>\t; ", _a, "\t", _sbx)
         end
 	end
 	
@@ -125,7 +125,11 @@ function Dump(file)
 	end
 
 	print("[File Header]")
-	print("Identifier: ", file.Identifier)
+    if file.Identifier == "\027Lua" then
+        print("Identifier: ", "<ESC>Lua")
+    else
+        print("Identifier (Invalid): ", file.Identifier)
+    end
 	print("Version: ", ("0x%02X"):format(file.Version))
 	print("Format: ", file.Format)
 	print("Little Endian: ", tostring(not file.BigEndian))

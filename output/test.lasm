@@ -1,0 +1,6 @@
+.const "print"
+.const "Hello"
+getglobal 0 0
+loadk 1 1
+call 0 2 1
+return 0 1

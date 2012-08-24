@@ -1,16 +1,24 @@
+-- This is a full lua decompiler. In 4 kilobytes.
 Decompile = Decompile or { }
 Decompile.LASM = function(file)
     local s = ""
+    local indent = 0
     
     local function write(t)
-        s = s .. t .. "\r\n"
+        s = s .. string.rep("    ", indent) .. t .. "\r\n"
     end
     
     local function decompile(chunk)
-        write("; Function " .. chunk.Name)
-        write(".func")
+        if chunk ~= file.Main then
+            write("; Function " .. chunk.Name)
+            write(".func")
+            indent = indent + 1
+        else
+            write("; Main code")
+        end
         write(".name \"" .. chunk.Name .. "\"")
         write(".options " .. chunk.UpvalueCount .. " " .. chunk.ArgumentCount .. " " .. chunk.Vararg .. " " .. chunk.MaxStackSize)
+        write("; Above contains: Upvalue count, Argument count, Vararg flag, Max Stack Size")
         write""
         if chunk.Constants.Count > 0 then
             write("; Constants")
@@ -72,7 +80,10 @@ Decompile.LASM = function(file)
                 decompile(chunk.Protos[i - 1])
             end
         end
-        write(".end")
+        if chunk ~= file.Main then
+            indent = indent - 1
+            write(".end")
+        end
     end
     
     decompile(file.Main)

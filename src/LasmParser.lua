@@ -66,7 +66,13 @@ Parser = {
             elseif ll:sub(1, 5) == ".name" then
                 -- Im lazy :P
                 local l = line:sub(6)
-                func.Name = loadstring("return " .. l)()
+                while l:sub(1, 1) == " " or l:sub(1, 1) == "\t" do l = l:sub(2) end
+                if l:sub(1, 1) == "\"" then
+                    func.Name = loadstring("return " .. l)()
+                else
+                    while l:sub(-1, -1) == " " or l:sub(-1, -1) == "\t" do l = l:sub(1, -2) end
+                    func.Name = l
+                end
             elseif ll:sub(1, 8) == ".options" then
                 local l = line:sub(9)
                 local t = { }
@@ -89,19 +95,37 @@ Parser = {
                 while l:sub(-1, -1) == " " or l:sub(-1, -1) == "\t" do
                     l = l:sub(1, -2) -- strip ending whitespace
                 end
-                func.Locals[func.Locals.Count] = Local:new(l, 0, 0)
+                if l:sub(1, 1) == "\"" then
+                    func.Locals[func.Locals.Count] = Local:new(loadstring("return " .. l)(), 0, 0)
+                else
+                    func.Locals[func.Locals.Count] = Local:new(l, 0, 0)
+                end
             elseif ll:sub(1, 6) == ".upval" then
                 local l = line:sub(7)
                 while l:sub(1, 1) == " " or l:sub(1, 1) == "\t" do
                     l = l:sub(2) -- strip whitespace
                 end
-                func.Upvalues[func.Upvalues.Count] = { Name = l }
+                while l:sub(-1, -1) == " " or l:sub(-1, -1) == "\t" do
+                    l = l:sub(1, -2) -- strip ending whitespace
+                end
+                if l:sub(1, 1) == "\"" then
+                    func.Upvalues[func.Upvalues.Count] = { Name = loadstring("return " .. l)() }
+                else
+                    func.Upvalues[func.Upvalues.Count] = { Name = l }
+                end
             elseif ll:sub(1, 8) == ".upvalue" then
                 local l = line:sub(9)
                 while l:sub(1, 1) == " " or l:sub(1, 1) == "\t" do
                     l = l:sub(2) -- strip whitespace
                 end
-                func.Upvalues[func.Upvalues.Count] = { Name = l }
+                while l:sub(-1, -1) == " " or l:sub(-1, -1) == "\t" do
+                    l = l:sub(1, -2) -- strip ending whitespace
+                end
+                if l:sub(1, 1) == "\"" then
+                    func.Upvalues[func.Upvalues.Count] = { Name = loadstring("return " .. l)() }
+                else
+                    func.Upvalues[func.Upvalues.Count] = { Name = l }
+                end
             elseif ll:sub(1, 10) == ".stacksize" then
                 local l = line:sub(11)
                 while l:sub(1, 1) == " " or l:sub(1, 1) == "\t" do
@@ -109,6 +133,7 @@ Parser = {
                 end
                 local n = tonumber(l)
                 if not n then error("Unable to parse '" .. l .. "' into a number!") end
+                if math.floor(n) ~= n then error("Not a valid integer '" .. n .. "'!") end
                 func.MaxStackSize = n
             elseif ll:sub(1, 13) == ".maxstacksize" then
                 local l = line:sub(14)
@@ -117,6 +142,7 @@ Parser = {
                 end
                 local n = tonumber(l)
                 if not n then error("Unable to parse '" .. l .. "' into a number!") end
+                if math.floor(n) ~= n then error("Not a valid integer '" .. n .. "'!") end
                 func.MaxStackSize = n
             elseif ll:sub(1, 7) == ".vararg" then
                 local l = line:sub(8)
@@ -125,6 +151,7 @@ Parser = {
                 end
                 local n = tonumber(l)
                 if not n then error("Unable to parse '" .. l .. "' into a number!") end
+                if math.floor(n) ~= n then error("Not a valid integer '" .. n .. "'!") end
                 func.Vararg = n
             elseif ll:sub(1, 9) == ".function" then
                 local l = line:sub(10)
@@ -137,7 +164,11 @@ Parser = {
                 local n = Chunk:new()
                 n.FirstLine = lineNumber
                 if l:len() > 0 then
-                    n.Name = l
+                    if l:sub(1, 1) == "\"" then
+                        n.Name = loadstring("return " .. l)()
+                    else
+                        n.Name = l
+                    end
                 end
                 getmetatable(func.Protos).__newindex(func.Protos, func.Protos.Count, n)
                 funcStack[#funcStack + 1] = func
@@ -153,20 +184,23 @@ Parser = {
                 local n = Chunk:new()
                 n.FirstLine = lineNumber
                 if l:len() > 0 then
-                    n.Name = l
+                    if l:sub(1, 1) == "\"" then
+                        n.Name = loadstring("return " .. l)()
+                    else
+                        n.Name = l
+                    end
                 end
                 getmetatable(func.Protos).__newindex(func.Protos, func.Protos.Count, n)
                 funcStack[#funcStack + 1] = func
                 func = n
             elseif ll:sub(1, 4) == ".end" then
                 local f = table.remove(funcStack)
-                f.LastLine = lineNumber
+                func.LastLine = lineNumber
                 local instr1 = func.Instructions[func.Instructions.Count - 1]
                 local instr2 = Instruction:new("RETURN")
                 instr2.A = 0
                 instr2.B = 1
                 instr2.C = 0
-                --getmetatable(func.Instructions).__newindex(func.Instructions, func.Instructions.Count, op)
                 if instr1 then
                     if instr1.Opcode ~= "RETURN" then
                         getmetatable(func.Instructions).__newindex(func.Instructions, func.Instructions.Count, instr2)
@@ -193,9 +227,10 @@ Parser = {
             
             local op = ""
             local i = 1
+            local l = line:lower()
             while true do
-                local c = line:sub(i, i)
-                if "a" <= c and c <= "z" then
+                local c = l:sub(i, i)
+                if "a" <= c and c <= "z" then -- reads a character
                     op = op .. c
                 else
                     break
@@ -477,7 +512,7 @@ if false then -- Testing.
     local p = Parser:new()
     local file = p:Parse[[
     .const "print"
-    .const "h\101llo"
+    .const "Hello"
     getglobal 0 0
     loadk 1 1
     call 0 2 1

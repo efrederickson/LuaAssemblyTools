@@ -1,4 +1,10 @@
-CHANGELOG FOR LBYTE
+CHANGELOG FOR Lua Assembly Toolkit
+
+8/23/12 - v1.1.1
+- LASM Compiler and Decompiler mini apps
+- Added external files
+- Platform conversion
+- Fixed a decompiler bug, code now can round trip and then run.
 
 8/22/12 - v1.1
 - LASM Decompiler
