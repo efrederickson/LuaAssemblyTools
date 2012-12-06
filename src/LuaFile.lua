@@ -13,9 +13,9 @@ LuaFile = {
             SizeT = 4,
             InstructionSize = 4,
             NumberSize = 8,
-            IsFloatingPointNumbers = true,
+            IsFloatingPoint = true,
             Main = Chunk:new(),
-        }, { __index = self, newindex = function() error"Cannot set new fields on LuaFile" end })
+        }, { __index = self, __newindex = function() error"Cannot set new fields on LuaFile" end })
     end,
 
     Compile = function(self)
@@ -28,7 +28,7 @@ LuaFile = {
         c = c .. DumpBinary.Int8(self.SizeT)
         c = c .. DumpBinary.Int8(self.InstructionSize)
         c = c .. DumpBinary.Int8(self.NumberSize)
-        c = c .. DumpBinary.Int8(self.IsFloatingPointNumbers and 0 or 1)
+        c = c .. DumpBinary.Int8(self.IsFloatingPoint and 0 or 1)
         -- Main function
         c = c .. self.Main:Compile(self)
         return c

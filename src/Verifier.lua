@@ -28,9 +28,7 @@ local OpcodeChecks = {
     
 }
 setmetatable(OpcodeChecks, {
-    __index = function(t, k) 
-        local x = rawget(t, k)
-        if x then return x end
+    __index = function(t, k)
         return function() end 
     end
 })

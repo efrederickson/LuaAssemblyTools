@@ -1,6 +1,4 @@
-package.path = "./src/?;./src/?.lua" .. package.path
-require"disassembler"
-dofile"./src/decompiler.lasm.lua"
+require'LAT'
 
 if #arg == 0 then
     error("No input file specified!")

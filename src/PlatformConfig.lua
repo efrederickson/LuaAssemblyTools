@@ -43,7 +43,7 @@ end
 
 -----------------------------------------------------------------------
 -- No more TEST_NUMBER in Lua 5.1, uses size_lua_Number + integral
--- LuaFile.IntegerSize .. (LuaFile.IsFloatingPoint and 0 or 1)
+-- LuaFile.NumberSize .. (LuaFile.IsFloatingPoint and 0 or 1)
 -----------------------------------------------------------------------
 LuaNumberID = {
   ["80"] = "double",         -- IEEE754 double
@@ -81,12 +81,12 @@ end
 -- Converts a little-endian integer string to a number
 ConvertFrom["int"] = function(x)
   local sum = 0
-  for i = config.size_lua_Number, 1, -1 do
+  for i = 4, 1, -1 do
     sum = sum * 256 + string.byte(x, i)
   end
   -- test for negative number
-  if string.byte(x, config.size_lua_Number) > 127 then
-    sum = sum - math.ldexp(1, 8 * config.size_lua_Number)
+  if string.byte(x, 4) > 127 then
+    sum = sum - math.ldexp(1, 8 * 4)
   end
   return sum
 end
@@ -140,13 +140,13 @@ ConvertTo["int"] = function(x)
   local v = ""
   x = math.floor(x)
   if x >= 0 then
-    for i = 1, config.size_lua_Number do
+    for i = 1, 4 do
       v = v..string.char(x % 256); x = math.floor(x / 256)
     end
   else-- x < 0
     x = -x
     local carry = 1
-    for i = 1, config.size_lua_Number do
+    for i = 1, 4 do
       local c = 255 - (x % 256) + carry
       if c == 256 then c = 0; carry = 1 else carry = 0 end
       v = v..string.char(c); x = math.floor(x / 256)
@@ -162,7 +162,7 @@ end
 ConvertTo["long long"] = ConvertTo["int"]
 
 function GetNumberType(file)
-    local nt = LuaNumberID[file.IntegerSize .. (file.IsFloatingPoint and 0 or 1)]
+    local nt = LuaNumberID[file.NumberSize .. (file.IsFloatingPoint and 0 or 1)]
     if not nt then
         error("Unable to determine Number type")
     end

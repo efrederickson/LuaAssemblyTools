@@ -1,0 +1,10 @@
+
+.func 'AF'
+    .options 0 1
+    add 0 0 k(10)
+    return 0 2
+.end
+
+closure 0 p'AF'
+getglobal 1 '_G'
+settable 1 'AddTen' 0

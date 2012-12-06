@@ -1,35 +1,49 @@
-package.path = "./src/?;./src/?.lua" .. package.path
-require"LasmParser"
-print"LASM Interpreter version 1.0"
+require'LAT'
+
+-- 1.0 - Original
+-- 1.1 - makes it not continue attempting to execute chunk if one step fails
+
+print"LASM Interpreter version 1.1"
 print"Copyright (C) 2012 LODC"
 print"Press <enter> twice (empty line) to run LASM chunk"
 
 while true do
-    io.write"> "
+    io.write">> "
     local line = ""
     while true do
         local line2 = io.read"*l"
         if line2 == "" then
             break
         else
-            line = line .. "\n" .. line2
+            if line == "" then 
+                line = line .. line2
+            else
+                line = line .. "\n" .. line2
+            end
         end
         io.write">> "
     end
     local p = Parser:new()
-    local ok, ret = pcall(p.Parse, p, line)
+    local ok, ret = pcall(p.Parse, p, line, "LASM Interactive Chunk")
     if not ok then
         print("Syntax Error: " .. ret)
-    end
-    local bCode = ret:Compile();
-    local ok, ret2 = loadstring(bCode)
-    if not ok then
-        print("Bytecode compilation error: " .. ret2)
-    end
-    local a, b = pcall(ok)
-    if not a then
-        print("Error: " .. b)
     else
-        print("Result: " .. (b or "<nothing>"))
+        local bCode
+        local ok, ret2 = pcall(function() bCode = ret:Compile() end)
+        if not ok then
+            print("Bytecode compilation error: " .. ret2)
+        else
+            local ok, ret2 = loadstring(bCode)
+            if not ok then
+                print("Bytecode compilation error: " .. ret2)
+            else
+                local a, b = pcall(ok)
+                if not a then
+                    print("Execution error: " .. b)
+                else
+                    print("Result: " .. (b or "<nothing>"))
+                end
+            end
+        end
     end
 end

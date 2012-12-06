@@ -7,7 +7,7 @@ bit = {
 			local total = 0
 			local digitn = 0
 			for i = n, n2 do
-				total = total + 2^digitn*bit.get(num, i)
+				total = total + 2 ^ digitn * bit.get(num, i)
 				digitn = digitn + 1
 			end
 			return total
@@ -56,7 +56,7 @@ DumpBinary = {
 		return string.char(n)
 	end,--[[
 	Int16 = function(n)
-		error("DumpBinary::Int16() Not Implemented")
+		error("DumpBinary.Int16() Not Implemented")
 	end,
 	Int32 = function(x)
 		local v = ""

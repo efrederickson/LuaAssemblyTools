@@ -1,6 +1,4 @@
-require"Disassembler"
-require"LasmParser"
-dofile"Decompiler.LASM.lua" -- hate how you can't have '.' in a require...
+require"LAT"
 
 -- Take a binary file, load it, decompile it to lasm, parse the lasm, compile all chunks to verify
 
@@ -19,3 +17,10 @@ b = p:Parse(str)
 print(loadstring(binary))
 print(loadstring(a:Compile()))
 print(loadstring(b:Compile()))
+
+--[[
+print(a:Compile() == b:Compile())
+print(a:Compile() == binary)
+print(b:Compile() == binary)
+print("Equal: ", assert(a:Compile() == b:Compile() == binary))
+]]

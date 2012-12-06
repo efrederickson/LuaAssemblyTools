@@ -46,44 +46,44 @@ iAsBx = "AsBx";
 }
 
 local LuaOpTypeLookup = {
-LuaOpType.iABC,
-LuaOpType.iABx,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABx,
-LuaOpType.iABC,
-LuaOpType.iABx,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC, --self = xLEGOx's Question (ABC works)
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iAsBx,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iAsBx,
-LuaOpType.iAsBx,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABC,
-LuaOpType.iABx,
-LuaOpType.iABC
+    LuaOpType.iABC,
+    LuaOpType.iABx,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABx,
+    LuaOpType.iABC,
+    LuaOpType.iABx,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC, --self = xLEGOx's Question (ABC works)
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iAsBx,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iAsBx,
+    LuaOpType.iAsBx,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABC,
+    LuaOpType.iABx,
+    LuaOpType.iABC
 }
 
 -- Parameter types (likely to change):
@@ -177,7 +177,7 @@ local LuaOp = {
 
 Instruction = {
     new = function(self, opcode, num)
-        opcode = type(opcode) == "number" and opcode or LuaOp[opcode:upper()] + 1 or error("Unknown opcode '" .. opcode .. "'!")
+        opcode = (type(opcode) == "number" and opcode) or (opcode and LuaOp[opcode:upper()] and LuaOp[opcode:upper()] + 1) or error("Unknown opcode '" .. (opcode or "<nil>") .. "'!")
         return setmetatable({ 
             A = 0,
             B = 0,
@@ -203,5 +203,11 @@ Local = {
 Constant = { 
     new = function(self, type, val)
         return setmetatable({ Type = type, Value = val, Number = 0 }, { __index = self })
+    end,
+}
+
+Upvalue = {
+    new = function(self, name)
+        return setmetatable({ Name = name }, { __index = self })
     end,
 }

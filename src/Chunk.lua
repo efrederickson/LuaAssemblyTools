@@ -5,25 +5,29 @@ require"Verifier"
 Chunk = {
     new = function(self)
         local function toList(t) -- little hack using meta tables i put together in like 30 seconds. Might have some issues.
-            return setmetatable(t, { table = { },
-            __newindex = function(t, k, v)
-                if v == nil then
-                    t.Count = t.Count - 1
-                else
-                    if k == "Count" then rawset(t, k, v) end
-                    if getmetatable(t).table[k] == nil then
-                        t.Count = t.Count + 1
+            t.Add = function(self, obj, index)
+                getmetatable(self).__newindex(self, index or self.Count, obj)
+            end
+            return setmetatable(t, { 
+                table = { },
+                __newindex = function(t, k, v)
+                    if v == nil then
+                        t.Count = t.Count - 1
+                    else
+                        if k == "Count" then rawset(t, k, v) end
+                        if getmetatable(t).table[k] == nil then
+                            t.Count = t.Count + 1
+                        end
+                    end
+                    getmetatable(t).table[k] = v
+                end,
+                __index = function(t, k)
+                    if k ~= "Count" then
+                        return getmetatable(t).table[k]
+                    else
+                        return rawget(t, k)
                     end
                 end
-                getmetatable(t).table[k] = v
-            end,
-            __index = function(t, k)
-                if k ~= "Count" then
-                    return getmetatable(t).table[k]
-                else
-                    return rawget(t, k)
-                end
-            end
             })
         end
         return setmetatable({
@@ -38,7 +42,7 @@ Chunk = {
             Constants = toList{ Count = 0 },
             Protos = toList{ Count = 0 },
             Locals = toList{ Count = 0 },
-            Upvalues = toList{ Count = 0}
+            Upvalues = toList{ Count = 0 },
         }, { __index = self })
     end,
     
@@ -55,9 +59,8 @@ Chunk = {
         end
         
         local function DumpString(s)
-            local len = file.SizeT
             if not s or s:len() == 0 then
-                return string.rep("\0", len)
+                return string.rep("\0", file.SizeT)--)len
             else
                 return DumpInt(s:len() + 1) .. s .. "\0"
             end
@@ -65,8 +68,8 @@ Chunk = {
         
         local c = ""
         c = c .. DumpString(self.Name)
-        c = c .. DumpInt(self.FirstLine)
-        c = c .. DumpInt(self.LastLine)
+        c = c .. DumpInt(self.FirstLine or 0)
+        c = c .. DumpInt(self.LastLine or 0)
         c = c .. DumpBinary.Int8(self.UpvalueCount)
         c = c .. DumpBinary.Int8(self.ArgumentCount)
         c = c .. DumpBinary.Int8(self.Vararg)

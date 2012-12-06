@@ -106,7 +106,6 @@ function Disassemble(chunk)
         for i = 1, count do
             local cnst = Constant:new()
             local t = ReadInt8()
-            
             cnst.Number = i-1
             
             if t == 0 then
@@ -171,7 +170,7 @@ function Disassemble(chunk)
 	file.SizeT = ReadInt8() 	
 	file.InstructionSize = ReadInt8()
 	file.NumberSize = ReadInt8()
-	file.IsFloatingPointNumbers = ReadInt8() == 0
+	file.IsFloatingPoint = ReadInt8() == 0
     loadNumber = GetNumberType(file)
     if file.InstructionSize ~= 4 then
         error("Unsupported instruction size '" .. file.InstructionSize .. "', expected '4'")

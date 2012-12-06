@@ -170,7 +170,7 @@ Parser = {
                         n.Name = l
                     end
                 end
-                getmetatable(func.Protos).__newindex(func.Protos, func.Protos.Count, n)
+                func.Protos:Add(n)
                 funcStack[#funcStack + 1] = func
                 func = n
             elseif ll:sub(1, 5) == ".func" then
@@ -190,7 +190,7 @@ Parser = {
                         n.Name = l
                     end
                 end
-                getmetatable(func.Protos).__newindex(func.Protos, func.Protos.Count, n)
+                func.Protos:Add(n)
                 funcStack[#funcStack + 1] = func
                 func = n
             elseif ll:sub(1, 4) == ".end" then
@@ -203,11 +203,10 @@ Parser = {
                 instr2.C = 0
                 if instr1 then
                     if instr1.Opcode ~= "RETURN" then
-                        getmetatable(func.Instructions).__newindex(func.Instructions, func.Instructions.Count, instr2)
-                        --table.insert(func.Instructions, func.Instructions.Count, instr2)
+                        func.Instructions:Add(instr2)
                     end
                 else
-                    getmetatable(func.Instructions).__newindex(func.Instructions, 0, instr2)
+                    func.Instructions:Add(instr2, 0)
                 end 
                     
                 func = f
@@ -483,9 +482,7 @@ Parser = {
                 local op = parseOpcode(line)
                 if not op then error"Unable to parse opcode!" end
                 op.LineNumber = lineNumber
-                --table.insert(func.Instructions, op)
-                -- I CAN'T BELIEVE I HAD TO RESORT TO THIS CRAP TO GET IT TO ADD INSTRUCTIONS. I MEAN SERIOUSLY, LUA, COME ON...
-                getmetatable(func.Instructions).__newindex(func.Instructions, func.Instructions.Count, op)
+                func.Instructions:Add(op)
             end
             lineNumber = lineNumber + 1
         end
@@ -495,14 +492,12 @@ Parser = {
         instr2.A = 0
         instr2.B = 1
         instr2.C = 0
-        --getmetatable(func.Instructions).__newindex(func.Instructions, func.Instructions.Count, op)
         if instr1 then
             if instr1.Opcode ~= "RETURN" then
-                getmetatable(func.Instructions).__newindex(func.Instructions, func.Instructions.Count, instr2)
-                --table.insert(func.Instructions, func.Instructions.Count, instr2)
+                func.Instructions:Add(instr2)
             end
         else
-            getmetatable(func.Instructions).__newindex(func.Instructions, 0, instr2)
+            func.Instructions:Add(instr2)
         end
         return file
     end,

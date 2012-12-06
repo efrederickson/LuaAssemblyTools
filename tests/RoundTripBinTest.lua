@@ -1,4 +1,4 @@
-require"Disassembler"
+require"LAT"
 
 -- Takes a luac file, decompiles it, recompiles it, and then loads both chunks to verify.
 
@@ -12,3 +12,4 @@ a = Disassemble(binary)
 b = a:Compile()
 print(loadstring(binary))
 print(loadstring(b))
+print("Equal:", assert(binary == b))
