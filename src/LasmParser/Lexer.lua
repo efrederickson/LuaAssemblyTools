@@ -1,4 +1,3 @@
-
 local function lookupify(tbl)
 	for _, v in pairs(tbl) do
 		tbl[v] = true
@@ -26,8 +25,6 @@ local Keywords = lookupify{
     '.stacksize', '.maxstacksize', '.vararg', '.function', '.func', '.end',
     
     'true', 'false', 'nil', 'null',
-    
-    --'k', 'const', 'constant'
 };
 
 Lexer = {

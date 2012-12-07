@@ -53,13 +53,13 @@ Decompile.LASM = function(file)
         if chunk.Locals.Count > 0 then
             write("; Locals")
             for i = 1, chunk.Locals.Count do
-                write(".local " .. chunk.Locals[i - 1].Name)
+                write(".local '" .. chunk.Locals[i - 1].Name .. "'")
             end
         end
         if chunk.Upvalues.Count > 0 then
             write("; Upvalues")
             for i = 1, chunk.Upvalues.Count do
-                write(".upval " .. chunk.Upvalues[i - 1].Name)
+                write(".upval '" .. chunk.Upvalues[i - 1].Name .. "'")
             end
         end
         write("; Instructions")

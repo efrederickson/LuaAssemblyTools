@@ -1,19 +1,24 @@
-CHANGELOG FOR Lua Assembly Toolkit
+CHANGELOG/TODO for Lua Assembly Toolkit
 
 - = done
 + = planned
 B = bug
 
-12/5/12 - v1.2
-- Add some more samples (make a samples dir?)
-- Complete re-write of the LASM parser, using tokenizer and parser
-- Empty strings now compile
 + Strictness for the LASM parser
 + add goto's for the LASM parser
     e.g. :
     ::label::
     jmp 0 label
 + add .params, .args, .arg, .arguments, .argcount, ... to set the argument count
++ stop writing line info when a LineNumber is 0
++ Change code to not clutter up the global namespace
+
+
+12/4/12 to 12/6/12 - v1.2
+- Add some more samples (make a samples dir?)
+- Complete re-write of the LASM parser, using tokenizer and parser
+- Empty strings now compile
+
 
 8/23/12 - v1.1.1
 - LASM Compiler and Decompiler mini apps

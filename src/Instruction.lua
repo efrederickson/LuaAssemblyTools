@@ -1,49 +1,12 @@
 local LuaOpName = {
-"MOVE",
-"LOADK",
-"LOADBOOL",
-"LOADNIL",
-"GETUPVAL",
-"GETGLOBAL",
-"GETTABLE",
-"SETGLOBAL",
-"SETUPVAL",
-"SETTABLE",
-"NEWTABLE",
-"SELF",
-"ADD",
-"SUB",
-"MUL",
-"DIV",
-"MOD",
-"POW",
-"UNM",
-"NOT",
-"LEN",
-"CONCAT",
-"JMP",
-"EQ",
-"LT",
-"LE",
-"TEST",
-"TESTSET",
-"CALL",
-"TAILCALL",
-"RETURN",
-"FORLOOP",
-"FORPREP",
-"TFORLOOP",
-"SETLIST",
-"CLOSE",
-"CLOSURE",
-"VARARG"
+    "MOVE", "LOADK", "LOADBOOL", "LOADNIL", "GETUPVAL", "GETGLOBAL",
+    "GETTABLE", "SETGLOBAL", "SETUPVAL", "SETTABLE", "NEWTABLE", "SELF", 
+    "ADD", "SUB", "MUL", "DIV", "MOD", "POW", "UNM", "NOT", "LEN", "CONCAT", 
+    "JMP", "EQ", "LT", "LE", "TEST", "TESTSET", "CALL", "TAILCALL", "RETURN",
+    "FORLOOP", "FORPREP", "TFORLOOP", "SETLIST", "CLOSE", "CLOSURE", "VARARG",
 }
 
-local LuaOpType = {
-iABC = "ABC";
-iABx = "ABx";
-iAsBx = "AsBx";
-}
+local LuaOpType = { iABC = "ABC", iABx = "ABx", iAsBx = "AsBx" }
 
 local LuaOpTypeLookup = {
     LuaOpType.iABC,
@@ -83,7 +46,7 @@ local LuaOpTypeLookup = {
     LuaOpType.iABC,
     LuaOpType.iABC,
     LuaOpType.iABx,
-    LuaOpType.iABC
+    LuaOpType.iABC,
 }
 
 -- Parameter types (likely to change):
@@ -95,44 +58,44 @@ local LuaOpTypeLookup = {
     -- Jump Distace 	 = 5
 
 local LuaOpcodeParams = {
-["MOVE"] = {1, 1, 0},
-["LOADK"] = {1, 2, 0},
-["LOADBOOL"] = {1, 0, 0},
-["LOADNIL"] = {1, 1, 1},
-["GETUPVAL"] = {1, 4, 5},
-["GETGLOBAL"] = {1, 2, 0},
-["GETTABLE"] = {1, 1, 3},
-["SETGLOBAL"] = {1, 2, 0},
-["SETUPVAL"] = {1, 4, 5},
-["SETTABLE"] = {1, 3, 3},
-["NEWTABLE"] = {1, 0, 0},
-["SELF"] = {1, 1, 3},
-["ADD"] = {1, 1, 3},
-["SUB"] = {1, 1, 3},
-["MUL"] = {1, 1, 3},
-["DIV"] = {1, 1, 3},
-["MOD"] = {1, 1, 3},
-["POW"] = {1, 1, 3},
-["UNM"] = {1, 1, 0},
-["NOT"] = {1, 1, 0},
-["LEN"] = {1, 1, 0},
-["CONCAT"] = {1, 1, 1},
-["JMP"] = {0, 5, 0},
-["EQ"] = {1, 3, 3},
-["LT"] = {1, 3, 3},
-["LE"] = {1, 3, 3},
-["TEST"] = {1, 0, 1},
-["TESTSET"] = {1, 1, 1},
-["CALL"] = {1, 0, 0},
-["TAILCALL"] = {1, 0, 0},
-["RETURN"] = {1, 0, 0},
-["FORLOOP"] = {1, 5, 0},
-["FORPREP"] = {1, 5, 0},
-["TFORLOOP"] = {1, 5, 0},
-["SETLIST"] = {1, 0, 0},
-["CLOSE"] = {1, 0, 0},
-["CLOSURE"] = {1, 0, 0},
-["VARARG"] = {1, 1, 0},
+    MOVE = { 1, 1, 0 },
+    LOADK = { 1, 2, 0 },
+    LOADBOOL = { 1, 0, 0 },
+    LOADNIL = { 1, 1, 1 },
+    GETUPVAL = { 1, 4, 5 },
+    GETGLOBAL = { 1, 2, 0 },
+    GETTABLE = { 1, 1, 3 },
+    SETGLOBAL = { 1, 2, 0 },
+    SETUPVAL = { 1, 4, 5 },
+    SETTABLE = { 1, 3, 3 },
+    NEWTABLE = { 1, 0, 0 },
+    SELF = { 1, 1, 3 },
+    ADD = { 1, 1, 3 },
+    SUB = { 1, 1, 3 },
+    MUL = { 1, 1, 3 },
+    DIV = { 1, 1, 3 },
+    MOD = { 1, 1, 3 },
+    POW = { 1, 1, 3 },
+    UNM = { 1, 1, 0 },
+    NOT = { 1, 1, 0 },
+    LEN = { 1, 1, 0 },
+    CONCAT = { 1, 1, 1 },
+    JMP = {0, 5, 0 },
+    EQ = { 1, 3, 3 },
+    LT = { 1, 3, 3 },
+    LE = { 1, 3, 3 },
+    TEST = { 1, 0, 1 },
+    TESTSET = { 1, 1, 1 },
+    CALL = { 1, 0, 0 },
+    TAILCALL = { 1, 0, 0 },
+    RETURN = { 1, 0, 0 },
+    FORLOOP = { 1, 5, 0 },
+    FORPREP = { 1, 5, 0 },
+    TFORLOOP = { 1, 5, 0 },
+    SETLIST = { 1, 0, 0 },
+    CLOSE = { 1, 0, 0 },
+    CLOSURE = { 1, 0, 0 },
+    VARARG = { 1, 1, 0 },
 }
 local LuaOp = {
 	MOVE = 0,
@@ -177,7 +140,7 @@ local LuaOp = {
 
 Instruction = {
     new = function(self, opcode, num)
-        opcode = (type(opcode) == "number" and opcode) or (opcode and LuaOp[opcode:upper()] and LuaOp[opcode:upper()] + 1) or error("Unknown opcode '" .. (opcode or "<nil>") .. "'!")
+        opcode = (type(opcode) == "number" and opcode) or (opcode and LuaOp[opcode:upper()] and LuaOp[opcode:upper()] + 1) or error("Unknown opcode '" .. (opcode == nil and  "<nil>" or opcode) .. "'!")
         return setmetatable({ 
             A = 0,
             B = 0,
@@ -190,7 +153,7 @@ Instruction = {
             OpcodeParams = LuaOpcodeParams[LuaOpName[opcode]],
             Number = num or 0,
             LineNumber = 0,
-            }, { __index = self })
+        }, { __index = self })
     end,
 }
 

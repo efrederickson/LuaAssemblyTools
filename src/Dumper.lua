@@ -6,7 +6,13 @@ function Dump(file)
 	local last = true
 	
 	local function print(...) -- MWAHAHA HAX !!
-		_print(("\t"):rep(indent) .. table.concat({...}, ""))
+        local function patch(...)
+            local t = { ... }
+            local r = { }
+            for k, v in pairs(t) do r[k] = tostring(v) end
+            return unpack(r)
+        end
+		_print(("\t"):rep(indent) .. table.concat({patch(...)}, ""))
 	end
 	
 	local function getSpec(chunk, instr, a, b, c)

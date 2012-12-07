@@ -1,6 +1,6 @@
 require"bin"
 require"PlatformConfig"
-require"Verifier"
+local verifier = require"Verifier"
 
 Chunk = {
     new = function(self)
@@ -137,21 +137,25 @@ Chunk = {
     
     StripDebugInfo = function(self)
         self.Name = ""
-        self.FirstLine = 1
-        self.LastLine = 1
+        self.FirstLine = 0
+        self.LastLine = 0
         for i = 1, self.Instructions.Count do
             self.Instructions[i - 1].LineNumber = 0
         end
         for i = 1, self.Protos.Count do
             self.Protos[i - 1]:StripDebugInfo()
         end
+        if self.UpvalueCount < self.Upvalues.Count then self.UpvalueCount = self.Upvalues.Count end
         for i = 1, self.Upvalues.Count do
             self.Upvalues[i - 1].Name = ""
+        end
+        for i = 1, self.Locals.Count do
+            self.Locals[i - 1] = nil
         end
     end,
     
     Verify = function(self)
-        VerifyChunk(self)
+        verifier(self)
         for i = 1, self.Protos.Count do
             self.Protos[i - 1]:Verify()
         end

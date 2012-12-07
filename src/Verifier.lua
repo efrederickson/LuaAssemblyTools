@@ -212,7 +212,8 @@ setmetatable(OpcodeChecks, {
     end
 })
 
-function VerifyChunk(chunk)
+--function VerifyChunk(chunk)
+return function(chunk)
     assert(chunk.MaxStackSize <= 255, "Invalid MaxStackSize " .. chunk.MaxStackSize .. ". It must be <=255")
     for i = 1, chunk.Instructions.Count do
         local instr = chunk.Instructions[i - 1]
