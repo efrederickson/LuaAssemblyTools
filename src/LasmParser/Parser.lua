@@ -13,6 +13,7 @@ Parser = {
         local funcStack = { } -- functions... for nesting functions and such
         local func = nil -- the current function
         local file = LuaFile:new()
+        local wasStacksizeSet = false
         file.Main.Vararg = 2 -- main function is always vararg
         file.Main.Name = self.name or name or "LASM Chunk"
         func = file.Main
@@ -137,8 +138,10 @@ Parser = {
                         func.Vararg = readNum()
                     elseif i == 3 then
                         func.MaxStackSize = readNum()
+                        wasStacksizeSet = true
                     end
                     i = i + 1
+                    tok:ConsumeSymbol','
                 end
             elseif tok:ConsumeKeyword".local" then
                 local name
@@ -158,6 +161,7 @@ Parser = {
                 func.Upvalues:Add(Upvalue:new(name))
             elseif tok:ConsumeKeyword".stacksize" or tok:ConsumeKeyword".maxstacksize" then
                 func.MaxStackSize = readNum()
+                wasStacksizeSet = true
             elseif tok:ConsumeKeyword".vararg" then
                 func.Vararg = readNum()
             elseif tok:ConsumeKeyword".func" or tok:ConsumeKeyword".function" then
@@ -288,7 +292,31 @@ Parser = {
             elseif instr.OpcodeType == "AsBx" then
                 instr.A = readnumber(isARK)
                 tok:ConsumeSymbol','
-                instr.sBx = readnumber(isBRK)
+                if instr.Opcode == "JMP" then
+                    if not isNumber() then
+                        instr.sBx = instr.A
+                        instr.A = 0
+                    else
+                        instr.sBx = readnumber(isBRK)
+                    end
+                else
+                    instr.sBx = readnumber(isBRK)
+                end
+            end
+            
+            
+            if instr.OpcodeParams[1] == 3 then
+                if not wasStacksizeSet and instr.A <= 255 then
+                    if func.MaxStackSize < instr.A + 1 then
+                        func.MaxStackSize = instr.A + 1
+                    end
+                end
+            elseif instr.OpcodeParams[1] == 1 then
+                if not wasStacksizeSet then
+                    if func.MaxStackSize < instr.A + 1 then
+                        func.MaxStackSize = instr.A + 1
+                    end
+                end
             end
             return instr
         end

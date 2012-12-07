@@ -37,7 +37,7 @@ Chunk = {
             UpvalueCount = 0,
             ArgumentCount = 0,
             Vararg = 0,
-            MaxStackSize = 10,
+            MaxStackSize = 250,
             Instructions = toList{ Count = 0 },
             Constants = toList{ Count = 0 },
             Protos = toList{ Count = 0 },
@@ -46,7 +46,9 @@ Chunk = {
         }, { __index = self })
     end,
     
-    Compile = function(self, file)
+    Compile = function(self, file, verify)
+        verify = verify == nil and true or verify
+        if verify then self:Verify() end
         local _, DumpNumber = GetNumberType(file)
         
         local function DumpInt(num)
@@ -60,7 +62,10 @@ Chunk = {
         
         local function DumpString(s)
             if not s or s:len() == 0 then
-                return string.rep("\0", file.SizeT)--)len
+                return DumpInt(1) .. "\0"
+                
+                -- wat? this doesn't work...
+                --return s = string.rep("\0", file.SizeT)-- 4)
             else
                 return DumpInt(s:len() + 1) .. s .. "\0"
             end

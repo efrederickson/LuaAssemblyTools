@@ -28,7 +28,7 @@ while true do
     if not ok then
         print("Syntax Error: " .. ret)
     else
-        local bCode
+        local bCode 
         local ok, ret2 = pcall(function() bCode = ret:Compile() end)
         if not ok then
             print("Bytecode compilation error: " .. ret2)

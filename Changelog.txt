@@ -7,7 +7,7 @@ B = bug
 12/5/12 - v1.2
 - Add some more samples (make a samples dir?)
 - Complete re-write of the LASM parser, using tokenizer and parser
-B There is something wrong. Somewhere. I can't decompile and then run LasmCompiler.lua
+- Empty strings now compile
 + Strictness for the LASM parser
 + add goto's for the LASM parser
     e.g. :

@@ -18,10 +18,10 @@ LuaFile = {
         }, { __index = self, __newindex = function() error"Cannot set new fields on LuaFile" end })
     end,
 
-    Compile = function(self)
+    Compile = function(self, verify)
         local c = ""
         c = c .. self.Identifier
-        c = c .. DumpBinary.Int8(self.Version) -- Should be 0x51
+        c = c .. DumpBinary.Int8(self.Version) -- Should be 0x51 (Q)
         c = c .. DumpBinary.Int8(self.Format == "Official" and 0 or 1)
         c = c .. DumpBinary.Int8(self.BigEndian and 0 or 1)
         c = c .. DumpBinary.Int8(self.IntegerSize)
@@ -30,7 +30,7 @@ LuaFile = {
         c = c .. DumpBinary.Int8(self.NumberSize)
         c = c .. DumpBinary.Int8(self.IsFloatingPoint and 0 or 1)
         -- Main function
-        c = c .. self.Main:Compile(self)
+        c = c .. self.Main:Compile(self, verify)
         return c
     end,
     
