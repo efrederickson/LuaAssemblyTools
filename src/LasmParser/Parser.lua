@@ -9,6 +9,9 @@ Parser = {
     Parse = function(self, source, name)
         local constTable = { } -- will fill up with [const] = [constant table index]
         local constNil = nil -- because you can't index a table with nil, sadly...
+        local funcJumps = { }
+        local fixJumps = { }
+        local funcJumpsTables = { }
         local funcConstTables = { } -- for functions, constTable and constNil go in here 
         local funcStack = { } -- functions... for nesting functions and such
         local func = nil -- the current function
@@ -77,6 +80,33 @@ Parser = {
         local function readNum()
             if not tok:Is'Number' then parseError"Number expected" end
             return evalNumber(tok:Get().Data) 
+        end
+        
+        local function isOpcode(d)
+            local x,y = pcall(function() Instruction:new(d) end)
+            --print(x, y)
+            return x
+        end
+        
+        local function patchJumps()
+            while #fixJumps > 0 do
+                local item = table.remove(fixJumps)
+                local found = false
+                for k, v in pairs(funcJumps) do
+                    if v.Label == item.Label then
+                        if v.Offset < item.Instr.Number then
+                            item.Instr.sBx = v.Offset - item.Instr.Number
+                        else
+                            item.Instr.sBx = v.Offset - item.Instr.Number
+                        end
+                        found = true
+                        break
+                    end
+                end
+                if not found then
+                    parseError("Label " .. item.Label .. " not found")
+                end
+            end
         end
         
         local function addConst(alwaysDefine)
@@ -172,7 +202,9 @@ Parser = {
                 funcStack[#funcStack + 1] = func
                 func = n
                 funcConstTables[#funcConstTables + 1] = { constTable = constTable, constNil = constNil }
+                funcJumpsTables[#funcJumpsTables + 1] = { jumps = funcJumps, fix = fixJumps }
             elseif tok:ConsumeKeyword".end" then
+                patchJumps()
                 local f = table.remove(funcStack)
                 func.LastLine = tok:Peek(-1).Line
                 local instr1 = func.Instructions[func.Instructions.Count - 1]
@@ -193,6 +225,9 @@ Parser = {
                 local ct = table.remove(funcConstTables)
                 constNil = ct.constNil
                 constTable = ct.constTable
+                local fj = table.remove(funcJumpsTables)
+                funcJumps = fj.jumps
+                fixJumps = fj.fix
             else
                 parseError("Unknown control '" .. tok:Peek().Data .. "'")
             end
@@ -290,17 +325,32 @@ Parser = {
                 tok:ConsumeSymbol','
                 instr.Bx = readnumber(isBRK)
             elseif instr.OpcodeType == "AsBx" then
-                instr.A = readnumber(isARK)
-                tok:ConsumeSymbol','
-                if instr.Opcode == "JMP" then
-                    if not isNumber() then
-                        instr.sBx = instr.A
-                        instr.A = 0
-                    else
-                        instr.sBx = readnumber(isBRK)
-                    end
-                else
+                if instr.Opcode ~= "JMP" then
+                    instr.A = readnumber(isARK)
+                    tok:ConsumeSymbol','
                     instr.sBx = readnumber(isBRK)
+                else
+                    local lbl = nil
+                    local function maybeNum()
+                        if not isNumber() then
+                            if isOpcode(tok:Peek().Data) == false and tok:Peek().Data ~= "" and tok:Is'Eof' == false then
+                                -- a jump label
+                                lbl = tok:Get().Data
+                                return 0
+                            else -- only sBx was specified
+                                instr.sBx = instr.A
+                                instr.A = 0
+                                return instr.sBx
+                            end
+                        else
+                            return readnumber(isBRK)
+                        end
+                    end
+                    instr.A = maybeNum()
+                    instr.sBx = maybeNum()
+                    if lbl then
+                        table.insert(fixJumps, { Instr = instr, Label = lbl })
+                    end
                 end
             end
             
@@ -326,14 +376,18 @@ Parser = {
                 doControl()
             elseif tok:Peek().Type == 'Ident' and tok:Peek().Data:sub(1, 1) == '.' then
                 parseError'Unknown control'
+            elseif tok:Is'Label' then
+                table.insert(funcJumps, { Label = tok:Get().Data, Offset = func.Instructions.Count })
             else
                 local ln = tok:Peek().Line
                 local opcode = parseOpcode()
                 if not opcode then parseError'Opcode expected' end
                 opcode.LineNumber = ln
+                opcode.Number = func.Instructions.Count + 1
                 func.Instructions:Add(opcode)
             end
         end
+        patchJumps()
         
         local instr1 = func.Instructions[func.Instructions.Count - 1]
         if instr1 then

@@ -73,7 +73,11 @@ Lexer = {
 
             -- local functions
             local function lexError(err)
-                return error(streamName .. ":" .. line .. ":" .. char .. ": " .. err)
+                if streamName ~= "" then
+                    error(streamName .. ":" .. line .. ":" .. char .. ": " .. err)
+                else
+                    error(line .. ":" .. char .. ": " .. err)
+                end
             end
 
             local function tryGetLongString()
@@ -287,8 +291,10 @@ Lexer = {
                 elseif Symbols[c] then
                     get()
                     toEmit = {Type = 'Symbol', Data = c}
-                --[[elseif c == ':' then
-                    if get() == ':' then
+                elseif c == ':' then
+                    get()
+                    if peek() == ':' then
+                        get()
                         c = peek()
                         if UpperChars[c] or LowerChars[c] or c == '_' then
                             --ident or keyword
@@ -297,14 +303,25 @@ Lexer = {
                                 get()
                                 c = peek()
                             until not (UpperChars[c] or LowerChars[c] or Digits[c] or c == '_')
+                            
                             local dat = src:sub(start, p - 1)
                             toEmit = {Type = 'Label', Data = dat}
+                            if not peek() == ':' then
+                                lexError"':' expected"
+                            else
+                                get()
+                                if not peek() == ':' then
+                                    lexError"':' expected"
+                                else
+                                    get()
+                                end
+                            end
                         else
                             lexError"':' expected"
                         end
                     else
                         lexError"':' expected"
-                    end]]
+                    end
                 else
                     lexError("Unexpected Symbol '" .. c .. "'")
                 end

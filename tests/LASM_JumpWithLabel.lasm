@@ -1,0 +1,5 @@
+::start::
+GETGLOBAL 0 'print'
+LOADK 1 'hi'
+CALL 0 2 1
+JMP start
