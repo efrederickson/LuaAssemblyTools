@@ -7,6 +7,19 @@ Chunk = {
         local function toList(t) -- little hack using meta tables i put together in like 30 seconds. Might have some issues.
             t.Add = function(self, obj, index)
                 getmetatable(self).__newindex(self, index or self.Count, obj)
+                return index or self.Count - 1
+            end
+            t.Remove = function(self, obj)
+                local mt = getmetatable(self)
+                for i = 1, self.Count do
+                    if self[i - 1] == obj then
+                        local x = table.remove(mt.table, i - 1)
+                        if x then
+                            self.Count = self.Count - 1
+                        end
+                        --print(mt.table[#mt.table].Opcode, self.Count, #mt.table)
+                    end
+                end
             end
             return setmetatable(t, { 
                 table = { },
@@ -26,6 +39,7 @@ Chunk = {
                         return getmetatable(t).table[k]
                     else
                         return rawget(t, k)
+                        --return #getmetatable(t).table + 1
                     end
                 end
             })

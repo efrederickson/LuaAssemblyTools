@@ -1,0 +1,5 @@
+loadk 0 k(10)
+loadk 1 k(5)
+ADD 1 0 1
+getglobal 0 'print'
+call 0 2 1

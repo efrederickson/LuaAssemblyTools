@@ -333,7 +333,9 @@ Parser = {
                     local lbl = nil
                     local function maybeNum()
                         if not isNumber() then
-                            if isOpcode(tok:Peek().Data) == false and tok:Peek().Data ~= "" and tok:Is'Eof' == false then
+                            if tok:Is'Ident'
+                            and isOpcode(tok:Peek().Data) == false 
+                            and tok:Peek().Data ~= "" then
                                 -- a jump label
                                 lbl = tok:Get().Data
                                 return 0
