@@ -62,11 +62,11 @@ local LuaOpcodeParams = {
     LOADK = { 1, 2, 0 },
     LOADBOOL = { 1, 0, 0 },
     LOADNIL = { 1, 1, 1 },
-    GETUPVAL = { 1, 4, 5 },
+    GETUPVAL = { 1, 4, 0 },
     GETGLOBAL = { 1, 2, 0 },
     GETTABLE = { 1, 1, 3 },
     SETGLOBAL = { 1, 2, 0 },
-    SETUPVAL = { 1, 4, 5 },
+    SETUPVAL = { 1, 4, 0 },
     SETTABLE = { 1, 3, 3 },
     NEWTABLE = { 1, 0, 0 },
     SELF = { 1, 1, 3 },
@@ -143,6 +143,7 @@ Instruction = {
         opcode = (type(opcode) == "number" and opcode) or (opcode and LuaOp[opcode:upper()] and LuaOp[opcode:upper()] + 1) or error("Unknown opcode '" .. (opcode == nil and  "<nil>" or opcode) .. "'!")
         return setmetatable({ 
             A = 0,
+            Ax = 0,
             B = 0,
             C = 0,
             Bx = 0,

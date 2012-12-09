@@ -5,10 +5,6 @@ CHANGELOG/TODO for Lua Assembly Toolkit
 B = bug
 
 + Strictness for the LASM parser
-+ add goto's for the LASM parser
-    e.g. :
-    ::label::
-    jmp 0 label
 + add .params, .args, .arg, .arguments, .argcount, ... to set the argument count
 + stop writing line info when a LineNumber is 0
 + Change code to not clutter up the global namespace
