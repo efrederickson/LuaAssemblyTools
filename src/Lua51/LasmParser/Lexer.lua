@@ -27,7 +27,7 @@ local Keywords = lookupify{
     'true', 'false', 'nil', 'null',
 };
 
-Lexer = {
+local Lexer = {
     new = function(self, str, name)
         return setmetatable({ _str = str, _name = name }, { __index = self })
     end,
@@ -453,3 +453,5 @@ Lexer = {
         return tok
     end
 }
+
+return Lexer

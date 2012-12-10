@@ -161,10 +161,12 @@ end
 -- because long longs exceeds the precision of doubles.
 ConvertTo["long long"] = ConvertTo["int"]
 
-function GetNumberType(file)
+local function GetNumberType(file)
     local nt = LuaNumberID[file.NumberSize .. (file.IsFloatingPoint and 0 or 1)]
     if not nt then
         error("Unable to determine Number type")
     end
     return ConvertFrom[nt], ConvertTo[nt]
 end
+
+return GetNumberType

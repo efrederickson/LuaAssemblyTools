@@ -1,7 +1,6 @@
-require"bin"
-require"Chunk"
+local LAT = LAT
 
-LuaFile = {
+local LuaFile = {
     -- Default to x86 standard
     new = function(self)
         return setmetatable({
@@ -14,7 +13,7 @@ LuaFile = {
             InstructionSize = 4,
             NumberSize = 8,
             IsFloatingPoint = true,
-            Main = Chunk:new(),
+            Main = LAT.Lua52.Chunk:new(),
             Tail = "",
         }, { __index = self, __newindex = function() error"Cannot set new fields on LuaFile" end })
     end,
@@ -22,14 +21,14 @@ LuaFile = {
     Compile = function(self, verify)
         local c = ""
         c = c .. self.Identifier
-        c = c .. DumpBinary.Int8(self.Version) -- Should be 0x51 (Q)
-        c = c .. DumpBinary.Int8(self.Format == "Official" and 0 or 1)
-        c = c .. DumpBinary.Int8(self.BigEndian and 0 or 1)
-        c = c .. DumpBinary.Int8(self.IntegerSize)
-        c = c .. DumpBinary.Int8(self.SizeT)
-        c = c .. DumpBinary.Int8(self.InstructionSize)
-        c = c .. DumpBinary.Int8(self.NumberSize)
-        c = c .. DumpBinary.Int8(self.IsFloatingPoint and 0 or 1)
+        c = c .. LAT.Lua52.DumpBinary.Int8(self.Version) -- Should be 0x51 (Q)
+        c = c .. LAT.Lua52.DumpBinary.Int8(self.Format == "Official" and 0 or 1)
+        c = c .. LAT.Lua52.DumpBinary.Int8(self.BigEndian and 0 or 1)
+        c = c .. LAT.Lua52.DumpBinary.Int8(self.IntegerSize)
+        c = c .. LAT.Lua52.DumpBinary.Int8(self.SizeT)
+        c = c .. LAT.Lua52.DumpBinary.Int8(self.InstructionSize)
+        c = c .. LAT.Lua52.DumpBinary.Int8(self.NumberSize)
+        c = c .. LAT.Lua52.DumpBinary.Int8(self.IsFloatingPoint and 0 or 1)
         c = c .. self.Tail
         -- Main function
         c = c .. self.Main:Compile(self, verify)
@@ -44,3 +43,5 @@ LuaFile = {
         self.Main:StripDebugInfo()
     end,
 }
+
+return LuaFile

@@ -1,7 +1,7 @@
-require"bin"
-require"Chunk"
+local Chunk = LAT.Lua51.Chunk
+local DumpBinary = LAT.Lua51.DumpBinary
 
-LuaFile = {
+local LuaFile = {
     -- Default to x86 standard
     new = function(self)
         return setmetatable({
@@ -46,3 +46,5 @@ LuaFile = {
         self.Main:Verify()
     end,
 }
+
+return LuaFile

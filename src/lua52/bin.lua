@@ -1,4 +1,4 @@
-bit = {
+local bit = {
 	new = function(str)
 		return tonumber(str, 2)
 	end,
@@ -40,7 +40,7 @@ local function keep (x, n) return x % p2[n+1] end
 local function srb (x,n) return math.floor(x / p2[n+1]) end
 local function slb (x,n) return x * p2[n+1] end
 
-DumpBinary = {
+local DumpBinary = {
     -- This is... bad. Only support X86 Standard
 	String = function(s)
         return DumpBinary.Int32(#s+1)..s.."\0"
@@ -72,6 +72,9 @@ DumpBinary = {
             return string.char(c0, c1, c2, c3)
         end
         if op.OpcodeType == "Ax" then
+            local axPos = 7
+            local asLen = 26
+            
             error("Opcodes of Ax are not supported")
         end
         c0 = op.OpcodeNumber + slb(keep(op.A, 2), 6)
@@ -81,3 +84,5 @@ DumpBinary = {
         return string.char(c0, c1, c2, c3)
     end
 }
+
+return { bit, DumpBinary }

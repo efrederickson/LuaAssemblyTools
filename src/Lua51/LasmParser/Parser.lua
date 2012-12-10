@@ -1,7 +1,7 @@
-Parser = {
+local Parser = {
     new = function(self, source, name)
         return setmetatable({ 
-            lexed = source and (type(source) == "table" and source) or (type(source) == "string" and Lexer:new():Lex(source, "<unknown>")) or nil,
+            lexed = source and (type(source) == "table" and source) or (type(source) == "string" and LAT.Lua51.Lexer:new():Lex(source, "<unknown>")) or nil,
             name = name
         }, { __index = self })
     end,
@@ -15,13 +15,13 @@ Parser = {
         local funcConstTables = { } -- for functions, constTable and constNil go in here 
         local funcStack = { } -- functions... for nesting functions and such
         local func = nil -- the current function
-        local file = LuaFile:new()
+        local file = LAT.Lua51.LuaFile:new()
         local wasStacksizeSet = false
         file.Main.Vararg = 2 -- main function is always vararg
         file.Main.Name = self.name or name or "LASM Chunk"
         func = file.Main
         
-        local tok = self.lexed or (type(source) == "table" and source) or (type(source) == "string" and Lexer:new():Lex(source, name or "<unknown>"))
+        local tok = self.lexed or (type(source) == "table" and source) or (type(source) == "string" and LAT.Lua51.Lexer:new():Lex(source, name or "<unknown>"))
         if not tok then error'No parser input!' end
         
         local function parseError(msg)
@@ -83,7 +83,7 @@ Parser = {
         end
         
         local function isOpcode(d)
-            local x,y = pcall(function() Instruction:new(d) end)
+            local x,y = pcall(function() LAT.Lua51.Instruction:new(d) end)
             --print(x, y)
             return x
         end
@@ -110,7 +110,7 @@ Parser = {
         end
         
         local function addConst(alwaysDefine)
-            alwaysDefine = alwaysDefine or true
+            alwaysDefine = alwaysDefine == nil and true or alwaysDefine
             local value = nil
             
             if tok:Is'String' then value = evalString(tok:Get().Data)
@@ -123,13 +123,13 @@ Parser = {
             
             if alwaysDefine or constTable[value] == nil then
                 if value == true or value == false then
-                    func.Constants:Add(Constant:new("Bool", value))
+                    func.Constants:Add(LAT.Lua51.Constant:new("Bool", value))
                 elseif value == nil then
-                    func.Constants:Add(Constant:new("Nil", nil))
+                    func.Constants:Add(LAT.Lua51.Constant:new("Nil", nil))
                 elseif type(value) == "number" then
-                    func.Constants:Add(Constant:new("Number", value))
+                    func.Constants:Add(LAT.Lua51.Constant:new("Number", value))
                 elseif type(value) == "string" then
-                    func.Constants:Add(Constant:new("String", value))
+                    func.Constants:Add(LAT.Lua51.Constant:new("String", value))
                 end
                 
                 if value ~= nil then
@@ -180,7 +180,7 @@ Parser = {
                 elseif tok:Is'Ident' then
                     name = tok:Get().Data
                 end
-                func.Locals:Add(Local:new(name, 0, 0))
+                func.Locals:Add(LAT.Lua51.Local:new(name, 0, 0))
             elseif tok:ConsumeKeyword".upval" or tok:ConsumeKeyword".upvalue" then
                 local name
                 if tok:Is'String' then
@@ -188,14 +188,14 @@ Parser = {
                 elseif tok:Is'Ident' then
                     name = tok:Get().Data
                 end
-                func.Upvalues:Add(Upvalue:new(name))
+                func.Upvalues:Add(LAT.Lua51.Upvalue:new(name))
             elseif tok:ConsumeKeyword".stacksize" or tok:ConsumeKeyword".maxstacksize" then
                 func.MaxStackSize = readNum()
                 wasStacksizeSet = true
             elseif tok:ConsumeKeyword".vararg" then
                 func.Vararg = readNum()
             elseif tok:ConsumeKeyword".func" or tok:ConsumeKeyword".function" then
-                local n = Chunk:new()
+                local n = LAT.Lua51.Chunk:new()
                 n.FirstLine = tok:Peek(-1).Line
                 n.Name = tok:Is'String' and readString() or "LASM Chunk"
                 func.Protos:Add(n)
@@ -208,7 +208,7 @@ Parser = {
                 local f = table.remove(funcStack)
                 func.LastLine = tok:Peek(-1).Line
                 local instr1 = func.Instructions[func.Instructions.Count - 1]
-                local instr2 = Instruction:new("RETURN")
+                local instr2 = LAT.Lua51.Instruction:new("RETURN")
                 instr2.A = 0
                 instr2.B = 1
                 instr2.C = 0
@@ -303,7 +303,7 @@ Parser = {
             
             if not tok:Is'Ident' then parseError'Opcode expected' end
             local op = tok:ConsumeIdent()            
-            local instr = Instruction:new(op, 0)
+            local instr = LAT.Lua51.Instruction:new(op, 0)
             if not instr.Opcode then
                 parseError("Unknown opcode: " .. op)
             end
@@ -356,7 +356,6 @@ Parser = {
                 end
             end
             
-            
             if instr.OpcodeParams[1] == 3 then
                 if not wasStacksizeSet and instr.A <= 255 then
                     if func.MaxStackSize < instr.A + 1 then
@@ -370,6 +369,7 @@ Parser = {
                     end
                 end
             end
+            
             return instr
         end
         
@@ -394,7 +394,7 @@ Parser = {
         local instr1 = func.Instructions[func.Instructions.Count - 1]
         if instr1 then
             if instr1.Opcode ~= "RETURN" then
-                local instr2 = Instruction:new("RETURN")
+                local instr2 = LAT.Lua51.Instruction:new("RETURN")
                 instr2.A = 0
                 instr2.B = 1
                 instr2.C = 0
@@ -407,3 +407,5 @@ Parser = {
         return file
     end,
 }
+
+return Parser

@@ -1,3 +1,4 @@
+local bit
 bit = {
 	new = function(str)
 		return tonumber(str, 2)
@@ -40,7 +41,7 @@ local function keep (x, n) return x % p2[n+1] end
 local function srb (x,n) return math.floor(x / p2[n+1]) end
 local function slb (x,n) return x * p2[n+1] end
 
-DumpBinary = {
+local DumpBinary = {
     -- This is... bad. Only support X86 Standard
 	String = function(s)
 		if #s ~= 0 then
@@ -145,3 +146,5 @@ DumpBinary = {
         return string.char(c0, c1, c2, c3)
     end
 }
+
+return { bit, DumpBinary }

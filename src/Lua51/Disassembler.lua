@@ -1,16 +1,15 @@
-require"Instruction"
-require"bin"
-require"Chunk"
-require"LuaFile"
-require"PlatformConfig"
+local bit = LAT.Lua51.bit
+local Chunk, Local, Constant, Upvalue, Instruction = LAT.Lua51.Chunk, LAT.Lua51.Local, LAT.Lua51.Constant, LAT.Lua51.Upvalue, LAT.Lua51.Instruction
+local Luafile = LAT.Lua51.LuaFile
+local GetNumberType = LAT.Lua51.GetNumberType
 
-function Disassemble(chunk)
+local function Disassemble(chunk)
     if chunk == nil then
         error("File is nil!")
     end
 	local index = 1
 	local big = false;
-    local file = LuaFile:new()
+    local file = LAT.Lua51.LuaFile:new()
     local loadNumber = nil
     
     local function Read(len)
@@ -147,7 +146,7 @@ function Disassemble(chunk)
         --c.Upvalues.Count = ReadInt32()
         count = ReadInt32()
         for i = 1, count do 
-            c.Upvalues[i - 1] = { Name = ReadString() }
+            c.Upvalues[i - 1] = Upvalue:new(ReadString())
         end
 		
 		return c
@@ -178,3 +177,5 @@ function Disassemble(chunk)
 	file.Main = ReadFunction()
 	return file
 end
+
+return Disassemble

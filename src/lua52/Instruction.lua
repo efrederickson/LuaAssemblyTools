@@ -145,7 +145,7 @@ local LuaOp = {
     EXTRAARG = 39,
 }
 
-Instruction = {
+local Instruction = {
     new = function(self, opcode, num)
         opcode = (type(opcode) == "number" and opcode) or (opcode and LuaOp[opcode:upper()] and LuaOp[opcode:upper()] + 1) or error("Unknown opcode '" .. (opcode == nil and  "<nil>" or opcode) .. "'!")
         return setmetatable({ 
@@ -164,21 +164,23 @@ Instruction = {
     end,
 }
 
-Local = {
+local Local = {
     new = function(self, name, spc, epc)
         return setmetatable({ Name = name, StartPC = spc, EndPC = epc }, { __index = self })
     end,
 }
 
-Constant = { 
+local Constant = { 
     new = function(self, type, val)
         return setmetatable({ Type = type, Value = val, Number = 0 }, { __index = self })
     end,
 }
 
-Upvalue = {
+local Upvalue = {
     new = function(self, instack, idx, name)
         return setmetatable({ InStack = instack, Index = idx, Name = name or "",}, { __index = self })
         --return setmetatable({ Name = name }, { __index = self })
     end,
 }
+
+return { Instruction, Local, Constant, Upvalue }

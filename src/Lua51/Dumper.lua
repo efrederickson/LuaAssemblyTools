@@ -1,6 +1,6 @@
 -- Mainly all LuaDbg code =P
 
-function Dump(file)
+local function Dump(file)
     local _print = print
 	local indent = 1
 	local last = true
@@ -148,3 +148,5 @@ function Dump(file)
     print("[Main function]")
 	dumpFunc(file.Main)
 end
+
+return Dump

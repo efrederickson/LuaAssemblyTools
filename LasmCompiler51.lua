@@ -32,7 +32,7 @@ local inFile = io.open(options.File, "r")
 if not inFile then error("Unable to open input file") end
 local source = inFile:read"*a"
 inFile:close()
-local p = Parser:new()
+local p = LAT.Lua51.Parser:new()
 local ok, file = pcall(p.Parse, p, source, options.File)
 --local ok
 --local file = p:Parse(source, options.File)
@@ -57,5 +57,5 @@ if options.Nocompile == false then
     f:close()
 end
 if options.Dump then
-    Dump(file)
+    LAT.Lua51.Dump(file)
 end

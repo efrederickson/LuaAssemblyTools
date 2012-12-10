@@ -1,16 +1,10 @@
-require"Instruction"
-require"bin"
-require"Chunk"
-require"LuaFile"
-require"PlatformConfig"
-
-function Disassemble(chunk)
+local function Disassemble(chunk)
     if chunk == nil then
         error("File is nil!")
     end
 	local index = 1
 	local big = false;
-    local file = LuaFile:new()
+    local file = LAT.Lua52.LuaFile:new()
     local loadNumber = nil
     
     local function Read(len)
@@ -70,7 +64,7 @@ function Disassemble(chunk)
 	end
     
 	local function ReadFunction()
-		local c = Chunk:new()
+		local c = LAT.Lua52.Chunk:new()
 		c.FirstLine = ReadInt32()
 		c.LastLine = ReadInt32()
 		c.ArgumentCount = ReadInt8()
@@ -82,20 +76,20 @@ function Disassemble(chunk)
         local count = ReadInt32()
         for i = 1, count do
             local op = ReadInt32();
-            local opcode = bit.get(op, 1, 6)
+            local opcode = LAT.Lua52.bit.get(op, 1, 6)
             local instr = Instruction:new(opcode + 1, i)
             if instr.OpcodeType == "ABC" then
-                instr.A = bit.get(op, 7, 14)
-                instr.B = bit.get(op, 24, 32)
-                instr.C = bit.get(op, 15, 23)
+                instr.A = LAT.Lua52.bit.get(op, 7, 14)
+                instr.B = LAT.Lua52.bit.get(op, 24, 32)
+                instr.C = LAT.Lua52.bit.get(op, 15, 23)
             elseif instr.OpcodeType == "ABx" then
-                instr.A = bit.get(op, 7, 14)
-                instr.Bx = bit.get(op, 15, 32)
+                instr.A = LAT.Lua52.bit.get(op, 7, 14)
+                instr.Bx = LAT.Lua52.bit.get(op, 15, 32)
             elseif instr.OpcodeType == "AsBx" then
-                instr.A = bit.get(op, 7, 14)
-                instr.sBx = bit.get(op, 15, 32) - 131071
+                instr.A = LAT.Lua52.bit.get(op, 7, 14)
+                instr.sBx = LAT.Lua52.bit.get(op, 15, 32) - 131071
             elseif instr.OpcodeType == "Ax" then
-                instr.Ax = bit.get(op, 7, 26)
+                instr.Ax = LAT.Lua52.bit.get(op, 7, 26)
             end
             c.Instructions[i - 1] = instr
         end
@@ -104,7 +98,7 @@ function Disassemble(chunk)
         --c.Constants.Count = ReadInt32()
         count = ReadInt32()
         for i = 1, count do
-            local cnst = Constant:new()
+            local cnst = LAT.Lua52.Constant:new()
             local t = ReadInt8()
             cnst.Number = i-1
             
@@ -132,7 +126,7 @@ function Disassemble(chunk)
         
         count = ReadInt32()
         for i = 1, count do
-            local upv = Upvalue:new(ReadInt8(), ReadInt8())
+            local upv = LAT.Lua52.Upvalue:new(ReadInt8(), ReadInt8())
             c.Upvalues:Add(upv)
         end
         
@@ -146,7 +140,7 @@ function Disassemble(chunk)
         -- Locals
         count = ReadInt32()
         for i = 1, count do
-            c.Locals[i - 1] = Local:new(ReadString(), ReadInt32(), ReadInt32())
+            c.Locals[i - 1] = LAT.Lua52.Local:new(ReadString(), ReadInt32(), ReadInt32())
         end
         
         -- Upvalues
@@ -176,7 +170,7 @@ function Disassemble(chunk)
 	file.InstructionSize = ReadInt8()
 	file.NumberSize = ReadInt8()
 	file.IsFloatingPoint = ReadInt8() == 0
-    loadNumber = GetNumberType(file)
+    loadNumber = LAT.Lua52.GetNumberType(file)
     --file.Tail
     local tail = GetString(6)
     local shouldbe = string.char(0x19) .. string.char(0x93) .. "\r\n" .. string.char(0x1A) .. "\n"
@@ -190,3 +184,5 @@ function Disassemble(chunk)
 	file.Main = ReadFunction()
 	return file
 end
+
+return Disassemble

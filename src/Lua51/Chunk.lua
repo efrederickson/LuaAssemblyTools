@@ -1,7 +1,8 @@
-require"bin"
-require"PlatformConfig"
+local DumpBinary = LAT.Lua51.DumpBinary
+local GetNumberType = LAT.Lua51.GetNumberType
+local verifier = LAT.Lua51.Verifier
 
-Chunk = {
+local Chunk = {
     new = function(self)
         local function toList(t) -- little hack using meta tables i put together in like 30 seconds. Might have some issues.
             t.Add = function(self, obj, index)
@@ -59,7 +60,9 @@ Chunk = {
         }, { __index = self })
     end,
     
-    Compile = function(self, file)
+    Compile = function(self, file, verify)
+        verify = verify == nil and true or verify
+        if verify then self:Verify() end
         local _, DumpNumber = GetNumberType(file)
         
         local function DumpInt(num)
@@ -83,8 +86,10 @@ Chunk = {
         end
         
         local c = ""
+        c = c .. DumpString(self.Name)
         c = c .. DumpInt(self.FirstLine or 0)
         c = c .. DumpInt(self.LastLine or 0)
+        c = c .. DumpBinary.Int8(self.UpvalueCount)
         c = c .. DumpBinary.Int8(self.ArgumentCount)
         c = c .. DumpBinary.Int8(self.Vararg)
         c = c .. DumpBinary.Int8(self.MaxStackSize)
@@ -121,22 +126,33 @@ Chunk = {
             c = c .. self.Protos[i - 1]:Compile(file)
         end
         
-        -- Upvalues
-        c = c .. DumpInt(self.Upvalues.Count)
-        for i = 1, self.Upvalues.Count do
-            local x = self.Upvalues[i - 1]
-            c = c .. string.char(x.InStack)
-            c = c .. string.char(x.Index)
-        end
-        
-        -- Name
-        c = c .. DumpString(self.Name)
-        
         -- Line Numbers
+        
+        --[[ Why isn't this working?!?!?!?!?!
+        local num = 0
+        for i = 1, self.Instructions.Count do
+            if self.Instructions[i - 1].LineNumber <= 0 then
+                break
+            else
+                num = num + 1
+            end
+        end
+        if num >= self.Instructions.Count then  num = self.Instructions.Count - 1 end
+        
+        c = c .. DumpInt(num)
+print(num)
+        for i = 1, num do
+            c = c .. DumpInt(self.Instructions[i - 1].LineNumber)
+print(i, i-1, self.Instructions[i-1].LineNumber)
+        end
+        --]]
+        
+        --[ [
         c = c .. DumpInt(self.Instructions.Count)
         for i = 1, self.Instructions.Count do
             c = c .. DumpInt(self.Instructions[i - 1].LineNumber)
         end
+        --]]
         
         -- Locals 
         c = c .. DumpInt(self.Locals.Count)
@@ -173,4 +189,13 @@ Chunk = {
             self.Locals[i - 1] = nil
         end
     end,
+    
+    Verify = function(self)
+        verifier(self)
+        for i = 1, self.Protos.Count do
+            self.Protos[i - 1]:Verify()
+        end
+    end,
 }
+
+return Chunk

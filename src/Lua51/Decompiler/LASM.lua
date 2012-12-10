@@ -1,6 +1,5 @@
 -- This is a full lua decompiler. In 4 kilobytes.
-Decompile = Decompile or { }
-Decompile.LASM = function(file)
+return function(file)
     local s = ""
     local indent = 0
     

@@ -23,7 +23,7 @@ while true do
         end
         io.write">> "
     end
-    local p = Parser:new()
+    local p = LAT.Lua51.Parser:new()
     local ok, ret = pcall(p.Parse, p, line, "LASM Interactive Chunk")
     if not ok then
         print("Syntax Error: " .. ret)

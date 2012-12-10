@@ -8,7 +8,7 @@ if not f then error("Unable to open file") end
 binary = f:read("*a")
 f:close()
 
-a = Disassemble(binary)
+a = LAT.Lua51.Disassemble(binary)
 b = a:Compile()
 print(loadstring(binary))
 print(loadstring(b))
