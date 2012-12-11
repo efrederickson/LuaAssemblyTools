@@ -1,0 +1,6 @@
+.upval '_ENV' 1 0
+.const 'print'
+.const 'Hello World'
+gettabup 0 0 256
+loadk 1 1
+call 0 2 1

@@ -56,7 +56,9 @@ local Chunk = {
         }, { __index = self })
     end,
     
-    Compile = function(self, file)
+    Compile = function(self, file, verify)
+        verify = verify == nil and true or verify
+        if verify then self:Verify() end
         local _, DumpNumber = LAT.Lua52.GetNumberType(file)
         
         local function DumpInt(num)
@@ -168,6 +170,13 @@ local Chunk = {
         end
         for i = 1, self.Locals.Count do
             self.Locals[i - 1] = nil
+        end
+    end,
+    
+    Verify = function(self)
+        LAT.Lua52.Verifier(self)
+        for i = 1, self.Protos.Count do
+            self.Protos[i - 1]:Verify()
         end
     end,
 }

@@ -1,4 +1,5 @@
-local bit = {
+local bit
+bit = {
 	new = function(str)
 		return tonumber(str, 2)
 	end,

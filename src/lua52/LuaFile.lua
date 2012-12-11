@@ -14,7 +14,7 @@ local LuaFile = {
             NumberSize = 8,
             IsFloatingPoint = true,
             Main = LAT.Lua52.Chunk:new(),
-            Tail = "",
+            Tail = string.char(0x19) .. string.char(0x93) .. "\r\n" .. string.char(0x1A) .. "\n",
         }, { __index = self, __newindex = function() error"Cannot set new fields on LuaFile" end })
     end,
 
@@ -41,6 +41,10 @@ local LuaFile = {
     
     StripDebugInfo = function(self)
         self.Main:StripDebugInfo()
+    end,
+    
+    Verify = function(self)
+        self.Main:Verify()
     end,
 }
 

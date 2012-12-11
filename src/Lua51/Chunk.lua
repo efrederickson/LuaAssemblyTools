@@ -1,7 +1,3 @@
-local DumpBinary = LAT.Lua51.DumpBinary
-local GetNumberType = LAT.Lua51.GetNumberType
-local verifier = LAT.Lua51.Verifier
-
 local Chunk = {
     new = function(self)
         local function toList(t) -- little hack using meta tables i put together in like 30 seconds. Might have some issues.
@@ -63,7 +59,7 @@ local Chunk = {
     Compile = function(self, file, verify)
         verify = verify == nil and true or verify
         if verify then self:Verify() end
-        local _, DumpNumber = GetNumberType(file)
+        local _, DumpNumber = LAT.Lua51.GetNumberType(file)
         
         local function DumpInt(num)
             local v = ""
@@ -89,10 +85,10 @@ local Chunk = {
         c = c .. DumpString(self.Name)
         c = c .. DumpInt(self.FirstLine or 0)
         c = c .. DumpInt(self.LastLine or 0)
-        c = c .. DumpBinary.Int8(self.UpvalueCount)
-        c = c .. DumpBinary.Int8(self.ArgumentCount)
-        c = c .. DumpBinary.Int8(self.Vararg)
-        c = c .. DumpBinary.Int8(self.MaxStackSize)
+        c = c .. LAT.Lua51.DumpBinary.Int8(self.UpvalueCount)
+        c = c .. LAT.Lua51.DumpBinary.Int8(self.ArgumentCount)
+        c = c .. LAT.Lua51.DumpBinary.Int8(self.Vararg)
+        c = c .. LAT.Lua51.DumpBinary.Int8(self.MaxStackSize)
         
         -- Instructions
         c = c .. DumpInt(self.Instructions.Count)
@@ -105,16 +101,16 @@ local Chunk = {
         for i = 1, self.Constants.Count do
             local cnst = self.Constants[i - 1]
             if cnst.Type == "Nil" then
-                c = c .. DumpBinary.Int8(0)
+                c = c .. LAT.Lua51.DumpBinary.Int8(0)
             elseif cnst.Type == "Bool" then
-                c = c .. DumpBinary.Int8(1)
-                c = c .. DumpBinary.Int8(cnst.Value and 1 or 0)
+                c = c .. LAT.Lua51.DumpBinary.Int8(1)
+                c = c .. LAT.Lua51.DumpBinary.Int8(cnst.Value and 1 or 0)
             elseif cnst.Type == "Number" then
-                c = c .. DumpBinary.Int8(3)
-                c = c .. DumpNumber(cnst.Value)
+                c = c .. LAT.Lua51.DumpBinary.Int8(3)
+                c = c .. LAT.Lua51.DumpNumber(cnst.Value)
             elseif cnst.Type == "String" then
-                c = c .. DumpBinary.Int8(4)
-                c = c .. DumpString(cnst.Value)
+                c = c .. LAT.Lua51.DumpBinary.Int8(4)
+                c = c .. LAT.Lua51.DumpString(cnst.Value)
             else
                 error("Invalid constant type: " .. (cnst.Type and cnst.Type or "<nil>"))
             end
@@ -191,7 +187,7 @@ print(i, i-1, self.Instructions[i-1].LineNumber)
     end,
     
     Verify = function(self)
-        verifier(self)
+        LAT.Lua51.Verifier(self)
         for i = 1, self.Protos.Count do
             self.Protos[i - 1]:Verify()
         end

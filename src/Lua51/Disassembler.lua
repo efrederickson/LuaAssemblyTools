@@ -1,9 +1,9 @@
-local bit = LAT.Lua51.bit
-local Chunk, Local, Constant, Upvalue, Instruction = LAT.Lua51.Chunk, LAT.Lua51.Local, LAT.Lua51.Constant, LAT.Lua51.Upvalue, LAT.Lua51.Instruction
-local Luafile = LAT.Lua51.LuaFile
-local GetNumberType = LAT.Lua51.GetNumberType
-
 local function Disassemble(chunk)
+    local bit = LAT.Lua51.bit
+    local Chunk, Local, Constant, Upvalue, Instruction = LAT.Lua51.Chunk, LAT.Lua51.Local, LAT.Lua51.Constant, LAT.Lua51.Upvalue, LAT.Lua51.Instruction
+    local Luafile = LAT.Lua51.LuaFile
+    local GetNumberType = LAT.Lua51.GetNumberType
+
     if chunk == nil then
         error("File is nil!")
     end

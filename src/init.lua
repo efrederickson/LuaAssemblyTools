@@ -34,10 +34,13 @@ LAT.Lua52.Local = ins[2]
 LAT.Lua52.Constant = ins[3]
 LAT.Lua52.Upvalue = ins[4]
 LAT.Lua52.Disassemble = require 'Lua52.Disassembler'
---LAT.Lua52.Dump = require 'Lua52.Dumper'
+LAT.Lua52.Dump = require 'Lua52.Dumper'
 LAT.Lua52.GetNumberType = require 'Lua52.PlatformConfig'
---LAT.Lua52.Verifier = require 'Lua52.Verifier'
+LAT.Lua52.Verifier = require 'Lua52.Verifier'
 LAT.Lua52.Decompile = { }
---LAT.Lua52.Decompile.LASM = require 'Lua52.Decompiler.LASM'
+LAT.Lua52.Decompile.LASM = require 'Lua52.Decompiler.LASM'
+
+LAT.Lua52.Lexer = require 'Lua52.LasmParser.Lexer'
+LAT.Lua52.Parser = require 'Lua52.LasmParser.Parser'
 
 return LAT

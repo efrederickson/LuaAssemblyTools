@@ -3,7 +3,7 @@ local function Disassemble(chunk)
         error("File is nil!")
     end
 	local index = 1
-	local big = false;
+	local big = false
     local file = LAT.Lua52.LuaFile:new()
     local loadNumber = nil
     
@@ -77,7 +77,7 @@ local function Disassemble(chunk)
         for i = 1, count do
             local op = ReadInt32();
             local opcode = LAT.Lua52.bit.get(op, 1, 6)
-            local instr = Instruction:new(opcode + 1, i)
+            local instr = LAT.Lua52.Instruction:new(opcode + 1, i)
             if instr.OpcodeType == "ABC" then
                 instr.A = LAT.Lua52.bit.get(op, 7, 14)
                 instr.B = LAT.Lua52.bit.get(op, 24, 32)
@@ -174,6 +174,12 @@ local function Disassemble(chunk)
     --file.Tail
     local tail = GetString(6)
     local shouldbe = string.char(0x19) .. string.char(0x93) .. "\r\n" .. string.char(0x1A) .. "\n"
+--[[    for i = 1, #tail do print(string.byte(tail:sub(i, i))) end
+    for i = 1, #shouldbe do print(string.byte(shouldbe:sub(i, i))) end
+print(index .. "<")
+for i = 1, index do print(string.byte(chunk:sub(i, i))) end
+print(chunk:sub(1, 1))]]
+
     file.Tail = tail --"\x19\x93\r\n\x1a\n"
     if tail ~= shouldbe then
         error("Invalid Tail in header")
