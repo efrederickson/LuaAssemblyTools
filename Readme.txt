@@ -1,4 +1,4 @@
-Lua Bytecode/Assembly Tools (LAT) is a Lua bytecode library written in Lua 5.1
+Lua Bytecode/Assembly Tools (LAT) is a Lua bytecode library written in Lua 5.1 (but should be 5.2 compatible)
 
 To use LuaAssemblyTools in your project, just require "LAT".
 
@@ -12,10 +12,10 @@ and ChunkSpy (http://luaforge.net/projects/chunkspy).
 Eventually, i hope to have full support for all available Lua versions.
 This is not going to happen in the near future though.
 
-(If not specified, its for Lua 5.1 operations)
+(If not specified, its for Lua 5.1 and 5.2 operations)
 Completed        Operation                        Description
 -------------------------------------------------------------------------------------
-Yes              Read (Lua 5.1)                   Reads bytecode
+Yes              Read                             Reads bytecode
 Yes              Write                            Writes bytecode
 Yes              Edit                             Inject, remove, and change bytecode
 Yes              LASM Decompiler                  Decompiles chunks to LASM

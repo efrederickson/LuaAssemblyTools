@@ -21,15 +21,17 @@ for i = 0, m.Instructions.Count - 1 do
             local i3 = m.Instructions[i - 2]
             if i2.Opcode == "LOADK" and i3.Opcode == "LOADK" then
                 if m.Constants[i2.Bx].Type == "Number" and m.Constants[i3.Bx].Type == "Number" then
-                    local x = m.Constants[i2.Bx].Value + m.Constants[i3.Bx].Value
-                    local idx = m.Constants:Add(LAT.Lua51.Constant:new("Number", x))
-                    m.Instructions:Remove(i1)
-                    m.Instructions:Remove(i2)
-                    m.Instructions:Remove(i3)
-                    local instr = LAT.Lua51.Instruction:new"LOADK"
-                    instr.A = i1.A
-                    instr.Bx = idx
-                    m.Instructions:Add(instr, i - 2) -- first LOADK index
+                    if (i1.B == i2.A or i1.C == i2.A) or (i1.B == i3.A or i1.C == i3.A) then
+                        local x = m.Constants[i2.Bx].Value + m.Constants[i3.Bx].Value
+                        local idx = m.Constants:Add(LAT.Lua51.Constant:new("Number", x))
+                        m.Instructions:Remove(i1)
+                        m.Instructions:Remove(i2)
+                        m.Instructions:Remove(i3)
+                        local instr = LAT.Lua51.Instruction:new"LOADK"
+                        instr.A = i1.A
+                        instr.Bx = idx
+                        m.Instructions:Add(instr, i - 2) -- first LOADK index
+                    end
                 end
             end
         end

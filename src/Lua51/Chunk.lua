@@ -93,7 +93,7 @@ local Chunk = {
         -- Instructions
         c = c .. DumpInt(self.Instructions.Count)
         for i = 1, self.Instructions.Count do
-            c = c .. DumpBinary.Opcode(self.Instructions[i - 1])
+            c = c .. LAT.Lua51.DumpBinary.Opcode(self.Instructions[i - 1])
         end
         
         -- Constants
@@ -107,10 +107,10 @@ local Chunk = {
                 c = c .. LAT.Lua51.DumpBinary.Int8(cnst.Value and 1 or 0)
             elseif cnst.Type == "Number" then
                 c = c .. LAT.Lua51.DumpBinary.Int8(3)
-                c = c .. LAT.Lua51.DumpNumber(cnst.Value)
+                c = c .. DumpNumber(cnst.Value)
             elseif cnst.Type == "String" then
                 c = c .. LAT.Lua51.DumpBinary.Int8(4)
-                c = c .. LAT.Lua51.DumpString(cnst.Value)
+                c = c .. DumpString(cnst.Value)
             else
                 error("Invalid constant type: " .. (cnst.Type and cnst.Type or "<nil>"))
             end

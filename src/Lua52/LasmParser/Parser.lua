@@ -173,6 +173,8 @@ local Parser = {
                     i = i + 1
                     tok:ConsumeSymbol','
                 end
+            elseif tok:ConsumeKeyword".params" or tok:ConsumeKeyword".args" or tok:ConsumeKeyword".arguments" or tok:ConsumeKeyword".argcount" then
+                func.ArgumentCount = readNum()
             elseif tok:ConsumeKeyword".local" then
                 local name
                 if tok:Is'String' then
