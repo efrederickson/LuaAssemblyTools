@@ -20,12 +20,10 @@ Yes              Write                            Writes bytecode
 Yes              Edit                             Inject, remove, and change bytecode
 Yes              LASM Decompiler                  Decompiles chunks to LASM
 Yes              LASM Parser                      Parses LASM and generates LuaFile's
-No               Decompiler                       Decompiles LuaFiles to Lua
-No               MSIL Decompiler                  Converts LuaFiles to MSIL
-No               JVM Decompiler                   Converts LuaFiles to Java bytecode
+Yes              Decompiler                       Decompiles bytecode to Lua
 No               Version converter (2.4-5.2)      Convert chunks to different versions
 Partial [2]      Platform converter               Converts platforms (SizeT, IntegerSize, BigEndian, etc..,)
-Partial          Verifier                         Verifies bytecode is valid
+Yes              Verifier                         Verifies bytecode is valid
 Yes              Strip/Remove debugging info      Removes debugging info
 Yes              Add/Edit debugging info          Adds and/or edits debugging info
 
