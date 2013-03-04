@@ -6,6 +6,8 @@ B = bug
 
 + add .params, .args, .arg, .arguments, .argcount, ... to set the argument count
 + stop writing line info when a LineNumber is 0
++ Find unused constants and remove them
++ Resize MaxStackSize based upon used/unused registers
 
 
 12/4/12 to 12/6/12 - v1.2

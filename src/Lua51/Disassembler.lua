@@ -85,6 +85,7 @@ local function Disassemble(chunk)
             local op = ReadInt32();
             local opcode = bit.get(op, 1, 6)
             local instr = Instruction:new(opcode + 1, i)
+            instr.Raw = op
             if instr.OpcodeType == "ABC" then
                 instr.A = bit.get(op, 7, 14)
                 instr.B = bit.get(op, 24, 32)

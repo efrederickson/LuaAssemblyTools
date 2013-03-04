@@ -24,7 +24,7 @@ local OpcodeChecks = {
 	
     LOADNIL = function(f, i)
         assert(i.A < f.MaxStackSize, "LOADNIL.A out of bounds")
-        assert(i.b < f.MaxStackSize, "LOADNIL.B out of bounds")
+        assert(i.B < f.MaxStackSize, "LOADNIL.B out of bounds")
     end,
     
     GETUPVAL = function(f, i)
@@ -179,7 +179,9 @@ local OpcodeChecks = {
     JMP = function(f, i, i2)
         if i.sBx < 0 then
             local tmp = f.Instructions.Count - (i2 - 1) + i.sBx + 1
-            assert(tmp >= 0, "JMP.sBx out of bounds")
+            --print(i.sBx, tmp)
+            --assert(tmp >= 0, "JMP.sBx out of bounds")
+            assert(math.abs(i.sBx) >= f.Instructions.Count - i2, "JMP.sBx out of bounds")
             --assert(i.sBx >= i2 - f.Instructions.Count, "JMP.sBx out of bounds")
         else
             assert(i.sBx < (f.Instructions.Count - i2) + 1, "JMP.sBx out of bounds")
@@ -195,7 +197,7 @@ local OpcodeChecks = {
     RETURN = function(f, i)
         assert(i.A < f.MaxStackSize, "RETURN.A out of bounds")
         assert(i.A + i.B - 2 < f.MaxStackSize, "RETURN.B out of bounds")
-        assert(i.A <= i.B, "RETURN.A must be <= than RETURN.B")
+        --assert(i.A <= i.B, "RETURN.A must be <= than RETURN.B")
     end,
     
     TAILCALL = function(f, i)
@@ -206,7 +208,7 @@ local OpcodeChecks = {
     VARARG = function(f, i)
         assert(i.A < f.MaxStackSize, "VARARG.A out of bounds")
         assert(i.A + i.B - 1 < f.MaxStackSize, "VARARG.B out of bounds")
-        assert(i.A <= i.B, "VARARG.A must be <= than VARARG.B")
+        --assert(i.A <= i.B, "VARARG.A must be <= than VARARG.B")
     end,
     
     SELF = function(f, i)

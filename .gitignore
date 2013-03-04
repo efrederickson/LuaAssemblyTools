@@ -2,3 +2,4 @@ samples\*.luac
 tests\*.luac
 src\*.luac
 Lua52bin*/
+t[e]mp/

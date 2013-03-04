@@ -43,4 +43,17 @@ LAT.Lua52.Decompile.LASM = require 'Lua52.Decompiler.LASM'
 LAT.Lua52.Lexer = require 'Lua52.LasmParser.Lexer'
 LAT.Lua52.Parser = require 'Lua52.LasmParser.Parser'
 
+LAT.Disassemble = function(s)
+    local c = s:sub(5, 1)
+    if c:len() == 0 then error("Invalid bytecode header") end
+    local b = string.byte(c)
+    if b == 0x52 then
+        return LAT.Lua52.Disassemble(s)
+    elseif b == 0x51 then
+        return LAT.Lua51.Disassemble(s)
+    else
+        error("Invalid bytecode header")
+    end
+end
+
 return LAT
