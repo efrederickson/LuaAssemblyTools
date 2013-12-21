@@ -21,7 +21,7 @@ local function Dump(file)
 			if a < chunk.Locals.Count then
 				if chunk.Locals[a].StartPC < c and chunk.Locals[a].EndPC >= c then
 					return "[" .. chunk.Locals[a].Name .."]"
-				elseif chunk.Locals[a].SPC == c then
+				elseif chunk.Locals[a].StartPC == c then
 					return "new [" .. chunk.Locals[a].Name .."]"
 				end
 			end

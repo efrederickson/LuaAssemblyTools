@@ -58,7 +58,7 @@ local function Disassemble(chunk)
 		local tmp = Read(file.SizeT)
         local sum = 0
         for i = file.SizeT, 1, -1 do
-          sum = sum * 256 + string.byte(tmp, i)
+            sum = sum * 256 + string.byte(tmp, i)
         end
 		return GetString(sum):sub(1, -2) -- Strip last '\0'
 	end
